@@ -41,7 +41,7 @@ TBD (Most popular, Starting Soon, Tailored recommendations)
 ## Team Members (Name / Student ID / GitHub username)
 
 - Abderrahmane Boulmalf — 40272217 — `AbderrahmaneBoulmalf`  
-- Rafael Wilian Lenz — 40259696  
+- Rafael Wilian Lenz — 40259696 — `RafaelL0311`  
 - Wiâme Kotbi — 40299105 — `wiamekotbi`  
 - Maria Laghmari — 40297167 — `marialagh`  
 - Mohamed Amine Dakli — 40318182 — `aminedakli`  
