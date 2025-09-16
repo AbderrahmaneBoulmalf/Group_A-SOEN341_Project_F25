@@ -1,0 +1,14 @@
+.gitignore
+node_modules
+dist
+eslint.config.js
+package.json
+package-lock.json
+tsconfig.json
+tsconfig.app.json
+tailwind.config.js
+tsconfig.node.json
+vite.config.ts
+postcss.config.js
+prettier.config.js
+README.md
