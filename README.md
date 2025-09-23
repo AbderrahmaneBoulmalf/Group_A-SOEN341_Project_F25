@@ -57,4 +57,6 @@ TBD (Most popular, Starting Soon, Tailored recommendations)
 
 ### Backend
 
-- TBD (Express, MySQL, Supabase)
+- Express.js
+- MySQL
+
