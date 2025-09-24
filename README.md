@@ -17,7 +17,7 @@ SOEN 341 Campus Events & Ticketing Project - Fall 2025
 
 ## Project Description  
 
-This project is about developing a **Campus Events & Ticketing Web Application** to help students discover, organize, and attend events on campus. Students can browse events, save them, claim free or paid tickets, and check in using QR codes. Organizers will be able to create and manage events, track attendance, and access analytics through dashboards, while administrators will oversee accounts, moderate events, and manage organizations.  
+This project is about developing a Campus Events & Ticketing Web Application to help students discover, organize, and attend events on campus. Students can browse events, save them, claim free or paid tickets, and check in using QR codes. Organizers will be able to create and manage events, track attendance, and access analytics through dashboards, while administrators will oversee accounts, moderate events, and manage organizations.  
 
 ## Specifications  
 
