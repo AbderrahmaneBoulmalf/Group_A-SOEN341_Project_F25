@@ -8,7 +8,8 @@ Contributions:
 Sofian Boutamo 
 
 Contributions:
--Created folders for sprints 1 to 4, each containing the minutes file and the logs file (1 min)
+- Created folders for sprints 1 to 4, each containing the minutes file and the logs file (1 min)
+- Assisted in the creation of the README.md file (5min)
 
 Wiâme Kotbi
 
