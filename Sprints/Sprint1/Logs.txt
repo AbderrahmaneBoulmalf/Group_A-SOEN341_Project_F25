@@ -16,3 +16,9 @@ Contributions:
 - Created User Stories and corresponding tasks (2h)
 - Finalized the README.md with the project description and team's information (5min)
 
+Rafael Lenz
+
+Contributions: 
+-Created UserStories and corresponding tasks (2h)
+-Wrote Minute Meeting for Sprint 1 (10min)
+
