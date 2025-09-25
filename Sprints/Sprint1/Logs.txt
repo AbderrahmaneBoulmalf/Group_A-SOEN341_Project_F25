@@ -22,3 +22,8 @@ Contributions:
 -Created UserStories and corresponding tasks (2h)
 -Wrote Minute Meeting for Sprint 1 (10min)
 
+Ziad Agha
+
+Contributions:
+-Assisted in creation of README.md with project description and language choices.
+
