@@ -9,3 +9,10 @@ Sofian Boutamo
 
 Contributions:
 -Created folders for sprints 1 to 4, each containing the minutes file and the logs file (1 min)
+
+Wiâme Kotbi
+
+Contributions:
+- Created User Stories and corresponding tasks (2h)
+- Finalized the README.md with the project description and team's information (5min)
+
