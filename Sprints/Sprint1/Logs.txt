@@ -35,3 +35,8 @@ Contributions:
 -Modified user stories description to fit a homogeneous model (20 mins)
 
 
+Maria Laghmari:
+- Set up the wiki page on github for the meeting minutes (5min)
+- Assisted in the creation of the README.md file (5min)
+- Assisted in user stories and tasks creation (1hour)
+
