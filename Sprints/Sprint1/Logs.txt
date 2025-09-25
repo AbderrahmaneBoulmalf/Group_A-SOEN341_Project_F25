@@ -1,0 +1,6 @@
+Sami Erafii
+
+Contributions:
+-Initialized README.md with project description (5 min)
+-Created User Stories and corresponding tasks (2 h)
+-Initialized Frontend folder (5 min)
