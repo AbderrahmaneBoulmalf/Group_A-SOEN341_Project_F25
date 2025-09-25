@@ -20,7 +20,7 @@ Contributions:
 Rafael Lenz
 
 Contributions: 
-- Created UserStories and corresponding tasks (2h)
+- Created User Stories and corresponding tasks (2h)
 - Wrote Minute Meeting for Sprint 1 (10min)
 
 Ziad Agha
