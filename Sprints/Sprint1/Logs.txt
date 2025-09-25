@@ -42,3 +42,9 @@ Contributions:
 - Assisted in the creation of the README.md file (5min)
 - Assisted in user stories and tasks creation (1hour)
 
+Abderrahmane Boulmalf
+
+Contributions:
+-Set the naming conventions for future branches and issues. (1h)
+-Assisted in Task assignments for the group (10min)
+-Created the repository for the group project.
