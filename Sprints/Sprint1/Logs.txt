@@ -25,5 +25,5 @@ Contributions:
 Ziad Agha
 
 Contributions:
--Assisted in creation of README.md with project description and language choices.
+- Assisted in creation of README.md with project description and language choices.
 
