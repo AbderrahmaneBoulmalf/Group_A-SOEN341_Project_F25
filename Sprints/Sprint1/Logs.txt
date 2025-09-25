@@ -1,9 +1,9 @@
 Sami Erafii
 
 Contributions:
--Initialized README.md with project description (5 min)
--Created User Stories and corresponding tasks (2 h)
--Initialized Frontend folder (5 min)
+- Initialized README.md with project description (5 min)
+- Created User Stories and corresponding tasks (2 h)
+- Initialized Frontend folder (5 min)
 
 Sofian Boutamo 
 
@@ -20,8 +20,8 @@ Contributions:
 Rafael Lenz
 
 Contributions: 
--Created UserStories and corresponding tasks (2h)
--Wrote Minute Meeting for Sprint 1 (10min)
+- Created UserStories and corresponding tasks (2h)
+- Wrote Minute Meeting for Sprint 1 (10min)
 
 Ziad Agha
 
@@ -31,12 +31,13 @@ Contributions:
 Mohamed Amine Dakli
 
 Contributions: 
--Assisted in the creation of the README.md file (5 mins)
--Assisted in user stories and tasks creation (1h)
--Modified user stories description to fit a homogeneous model (20 mins)
+- Assisted in the creation of the README.md file (5 mins)
+- Assisted in user stories and tasks creation (1h)
+- Modified user stories description to fit a homogeneous model (20 mins)
 
+Maria Laghmari
 
-Maria Laghmari:
+Contributions:
 - Set up the wiki page on github for the meeting minutes (5min)
 - Assisted in the creation of the README.md file (5min)
 - Assisted in user stories and tasks creation (1hour)
