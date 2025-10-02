@@ -1,0 +1,12 @@
+services:
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    ports:
+      - "8080:80" # http://localhost:8080
+    environment:
+      PMA_HOST: ${AIVEN_DB_HOST}
+      PMA_PORT: ${AIVEN_DB_PORT}
+      PMA_USER: ${AIVEN_DB_USER}
+      PMA_PASSWORD: ${AIVEN_DB_PASS}
+    restart: unless-stopped
