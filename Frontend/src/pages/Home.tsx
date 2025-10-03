@@ -27,6 +27,14 @@ const Home: React.FC = () => {
             {/* Navigation Links */}
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
+
+                <a
+                  href="#events"
+                  className="text-slate-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Events 
+                </a>
+                
                 <a
                   href="#about"
                   className="text-slate-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
