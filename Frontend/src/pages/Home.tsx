@@ -78,14 +78,14 @@ const Home: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
             <Button
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px] border-0"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px] border-0 focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
               Login
             </Button>
             <Button
               variant="outline"
               size="lg"
-              className="bg-white hover:bg-slate-50 text-blue-600 font-semibold py-3 px-8 rounded-lg border-2 border-blue-600 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px]"
+              className="bg-white hover:bg-slate-100 text-blue-600 font-semibold py-3 px-8 rounded-lg border-2 border-blue-600 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px] focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
               Sign Up
             </Button>
@@ -112,7 +112,7 @@ const Home: React.FC = () => {
               <h3 className="text-xl font-semibold text-slate-800 mb-2 text-center">
                 For Students
               </h3>
-              <p className="text-slate-600 text-center">
+              <p className="text-slate-600 text-center transition-colors duration-200 hover:text-blue-600 hover:bg-blue-50 rounded-md cursor-pointer px-2 py-1">
                 Discover and join events, track your participation, and connect
                 with your community.
               </p>
@@ -137,7 +137,7 @@ const Home: React.FC = () => {
               <h3 className="text-xl font-semibold text-slate-800 mb-2 text-center">
                 For Organizers
               </h3>
-              <p className="text-slate-600 text-center">
+              <p className="text-slate-600 text-center transition-colors duration-200 hover:text-blue-600 hover:bg-blue-50 rounded-md cursor-pointer px-2 py-1">
                 Create and manage events, track attendance, and engage with your
                 audience effectively.
               </p>
@@ -162,7 +162,7 @@ const Home: React.FC = () => {
               <h3 className="text-xl font-semibold text-slate-800 mb-2 text-center">
                 For Administrators
               </h3>
-              <p className="text-slate-600 text-center">
+              <p className="text-slate-600 text-center transition-colors duration-200 hover:text-blue-600 hover:bg-blue-50 rounded-md cursor-pointer px-2 py-1">
                 Oversee platform operations, manage users, and ensure smooth
                 event coordination.
               </p>
