@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Logo from "@/assets/logo.png";
+import { Link } from "react-router-dom";
 
 const Home: React.FC = () => {
   return (
@@ -84,16 +85,18 @@ const Home: React.FC = () => {
 
           {/* Login/Signup Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Button
-              size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px] border-0 focus:outline-none focus:ring-2 focus:ring-blue-400"
-            >
-              Login
-            </Button>
+            <Link to="/login" className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px] border-0"
+              >
+                Login
+              </Button>
+            </Link>
             <Button
               variant="outline"
               size="lg"
-              className="bg-white hover:bg-slate-100 text-blue-600 font-semibold py-3 px-8 rounded-lg border-2 border-blue-600 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px] focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="bg-white hover:bg-slate-100 text-blue-600 font-semibold py-3 px-8 rounded-lg border-2 border-blue-600 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px]"
             >
               Sign Up
             </Button>
