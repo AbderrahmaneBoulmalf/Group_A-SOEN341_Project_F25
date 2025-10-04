@@ -3,65 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Logo from "@/assets/logo.png";
 import { Link } from "react-router-dom";
+import Navbar from "@/components/navbar";
 
 const Home: React.FC = () => {
+  const date: number = new Date().getFullYear();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Navigation Header */}
-      <nav className="bg-white shadow-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo/Title */}
-            <div className="flex items-center">
-              <div className="flex-shrink-0 flex items-center space-x-3">
-                <img
-                  src={Logo}
-                  alt="EventHub Logo"
-                  className="w-10 h-10 transform transition-all duration-300 hover:scale-110 hover:rotate-3 hover:drop-shadow-lg cursor-pointer"
-                />
-                <h1 className="text-2xl font-bold text-slate-800 font-poppins">
-                  EventHub
-                </h1>
-              </div>
-            </div>
-
-            {/* Navigation Links */}
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-4">
-
-                <a
-                  href="#events"
-                  className="text-slate-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Events 
-                </a>
-                
-                <a
-                  href="#about"
-                  className="text-slate-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  About
-                </a>
-                <a
-                  href="#features"
-                  className="text-slate-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Features
-                </a>
-                <a
-                  href="#contact"
-                  className="text-slate-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Contact
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
-
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
+      <Navbar />
       {/* Hero Section */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow">
         <div className="text-center">
           {/* Main Title */}
           <div className="mb-12">
@@ -186,7 +137,7 @@ const Home: React.FC = () => {
       <footer className="bg-slate-800 text-white py-8 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-slate-300">
-            © 2024 EventHub - SOEN 341 Project. All rights reserved.
+            &copy; {date} EventHub - SOEN 341 Project. All rights reserved.
           </p>
         </div>
       </footer>
@@ -195,4 +146,3 @@ const Home: React.FC = () => {
 };
 
 export default Home;
-
