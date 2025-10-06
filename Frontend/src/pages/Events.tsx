@@ -1,67 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/navbar";
 import type { Event } from "../types/Event";
 
 const Events: React.FC = () => {
-  // Sample event data - in a real app, this would come from an API
-  const [events] = useState<Event[]>([
-    {
-      id: "1",
-      title: "Tech Conference 2024",
-      date: "2024-03-15",
-      organization: "Concordia University",
-      description: "Annual technology conference featuring industry leaders and innovative presentations.",
-      location: "Hall Building, Room H-110",
-      category: "Technology"
-    },
-    {
-      id: "2",
-      title: "Career Fair",
-      date: "2024-03-22",
-      organization: "Student Services",
-      description: "Connect with top employers and explore career opportunities.",
-      location: "Gymnasium",
-      category: "Career"
-    },
-    {
-      id: "3",
-      title: "Cultural Night",
-      date: "2024-04-05",
-      organization: "International Students Association",
-      description: "Celebrate diversity with performances, food, and cultural displays.",
-      location: "Student Center",
-      category: "Cultural"
-    },
-    {
-      id: "4",
-      title: "Hackathon",
-      date: "2024-04-12",
-      organization: "Computer Science Society",
-      description: "48-hour coding competition with prizes and networking opportunities.",
-      location: "Engineering Building",
-      category: "Technology"
-    },
-    {
-      id: "5",
-      title: "Research Symposium",
-      date: "2024-04-20",
-      organization: "Graduate Studies",
-      description: "Showcase of graduate research projects and findings.",
-      location: "Library Conference Room",
-      category: "Academic"
-    },
-    {
-      id: "6",
-      title: "Sports Tournament",
-      date: "2024-05-01",
-      organization: "Athletics Department",
-      description: "Annual inter-departmental sports competition.",
-      location: "Sports Complex",
-      category: "Sports"
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        const response = await fetch("http://localhost:3000/api/events", { credentials: "include" });
+        if (!response.ok) {
+          throw new Error("Failed to fetch events");
+        }
+        const data = await response.json();
+        setEvents(data);
+      } catch (e) {
+        setError("Failed to fetch events");
+      } finally {
+        setLoading(false);
+      }
     }
-  ]);
+    fetchEvents();
+  }, []);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
