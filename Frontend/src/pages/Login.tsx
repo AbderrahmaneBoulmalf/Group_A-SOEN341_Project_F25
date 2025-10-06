@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Spin, message } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import Navbar from "@/components/navbar";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -10,15 +12,35 @@ const Login: React.FC = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
   const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
+  const navigate = useNavigate();
 
-  const login = () => {
+  const login = async () => {
     setSubmitting(true);
-    // Handle login logic here
-    //Mock login delay
-    setTimeout(() => {
+    try {
+      const response = await axios.post("http://localhost:8787/login", {
+        email,
+        password,
+      });
+      if (response.data.success) {
+        success();
+        //Redirect to dashboard
+        const role: string = response.data.role.toLowerCase();
+        if (role === "admin") {
+          navigate("/admin");
+        } else if (role === "manager") {
+          navigate("/manager");
+        } else if (role === "student") {
+          navigate("/student");
+        }
+      }
+    } catch (error: any) {
+      if (error.response) {
+        showError();
+      }
+      console.log("Error: " + error.message);
+    } finally {
       setSubmitting(false);
-      success();
-    }, 1000);
+    }
   };
 
   const [messageApi, contextHolder] = message.useMessage();
@@ -27,6 +49,13 @@ const Login: React.FC = () => {
     messageApi.open({
       type: "success",
       content: "Login successful!",
+    });
+  };
+
+  const showError = () => {
+    messageApi.open({
+      type: "error",
+      content: "Login failed. Please check your credentials and try again.",
     });
   };
 
