@@ -1,6 +1,13 @@
 import bcrypt from "bcrypt";
 import db from "../db.js";
 import { Request, Response } from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const envPath = path.resolve(__dirname, "../../.env");
+dotenv.config({ path: envPath });
 
 const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;
@@ -45,8 +52,31 @@ const login = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const logout = (req: Request, res: Response): void => {
+  req.session.destroy((err) => {
+    if (err) {
+      res.status(500).json({
+        success: false,
+        message: (err as Error).message,
+      });
+      return;
+    }
+    res.clearCookie("connect.sid", {
+      // Default cookie name
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    });
+    res.status(200).json({
+      success: true,
+      message: "Logout successful",
+    });
+  });
+};
+
 const auth = {
   login,
+  logout,
 };
 
 export default auth;

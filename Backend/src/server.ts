@@ -15,6 +15,7 @@ dotenv.config({ path: envPath });
 const app = express();
 console.log("Database module imported:", db ? "success" : "failed");
 
+// Middleware
 app.use(express.json());
 
 app.use(
@@ -42,8 +43,12 @@ app.use((req, _, next) => {
   next();
 });
 
-app.post("/login", auth.login);
+// Routes
 
+app.post("/login", auth.login);
+app.post("/logout", auth.logout);
+
+// Start server
 app.listen(8787, () => {
   console.log("Server running on http://localhost:8787");
 });
