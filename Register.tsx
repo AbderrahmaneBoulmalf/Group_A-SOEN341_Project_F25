@@ -42,7 +42,7 @@ function Register() {
     };
   }, []);
 
-  //Backend stuff from login.tsx
+  // Backend stuff from login.tsx
   const signUp = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isFormValid || submitting) return;
@@ -103,9 +103,20 @@ function Register() {
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400"
+                    className={`mt-2 w-full rounded-lg border px-4 py-3 text-slate-800 outline-none focus:ring-2 bg-slate-50 ${
+                      email
+                        ? isEmailValid
+                          ? "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
+                          : "border-red-500 focus:border-red-500 focus:ring-red-300"
+                        : "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
+                    }`}
                     placeholder="Enter your email"
                   />
+                  {!isEmailValid && email.length > 0 && (
+                    <p className="mt-1 text-sm text-red-500">
+                      Please enter a valid email address.
+                    </p>
+                  )}
                 </div>
 
                 {/* Password */}
@@ -123,14 +134,25 @@ function Register() {
                     autoComplete="new-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-300 bg-yellow-50 px-4 py-3 text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400"
+                    className={`mt-2 w-full rounded-lg border px-4 py-3 text-slate-800 outline-none focus:ring-2 bg-yellow-50 ${
+                      password
+                        ? PASSWORD_REGEX.test(password)
+                          ? "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
+                          : "border-red-500 focus:border-red-500 focus:ring-red-300"
+                        : "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
+                    }`}
                     placeholder="Enter a password"
-                    onFocus={() =>
-                      message.info(
-                        "Password must be at least 8 characters and include one number."
-                      )
-                    }
                   />
+                  <p
+                    className={`mt-1 text-sm ${
+                      PASSWORD_REGEX.test(password)
+                        ? "text-slate-500"
+                        : "text-red-500"
+                    }`}
+                  >
+                    Must be at least 8 characters long and include at least one
+                    number.
+                  </p>
                 </div>
 
                 {/* Confirm Password */}
@@ -148,9 +170,20 @@ function Register() {
                     autoComplete="new-password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-300 bg-yellow-50 px-4 py-3 text-slate-800 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400"
+                    className={`mt-2 w-full rounded-lg border px-4 py-3 text-slate-800 outline-none focus:ring-2 bg-yellow-50 ${
+                      confirmPassword
+                        ? password === confirmPassword
+                          ? "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
+                          : "border-red-500 focus:border-red-500 focus:ring-red-300"
+                        : "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
+                    }`}
                     placeholder="Confirm your password"
                   />
+                  {confirmPassword && password !== confirmPassword && (
+                    <p className="mt-1 text-sm text-red-500">
+                      Passwords do not match.
+                    </p>
+                  )}
                 </div>
 
                 {/* Submit */}
