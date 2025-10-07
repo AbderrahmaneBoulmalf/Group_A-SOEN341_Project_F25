@@ -4,6 +4,7 @@ import db from "./db.js";
 import session from "express-session";
 // import authMiddleware from "./middleware/authMiddleware.js";
 import auth from "./accounts/auth.js";
+import events from "./events/events.js";
 import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
@@ -13,6 +14,7 @@ const envPath = path.resolve(__dirname, "../../.env");
 dotenv.config({ path: envPath });
 
 const app = express();
+
 console.log("Database module imported:", db ? "success" : "failed");
 
 // Middleware
@@ -43,10 +45,14 @@ app.use((req, _, next) => {
   next();
 });
 
-// Routes
+// Account Routes
 
 app.post("/login", auth.login);
 app.post("/logout", auth.logout);
+
+// Event Routes
+
+app.get("/api/events", events.getEvents);
 
 // Start server
 app.listen(8787, () => {
