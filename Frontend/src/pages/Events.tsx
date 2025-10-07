@@ -14,7 +14,7 @@ const Events: React.FC = () => {
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const response = await fetch("http://localhost:3000/api/events", {
+        const response = await fetch("http://localhost:8787/api/events", {
           credentials: "include",
         });
         if (!response.ok) {
