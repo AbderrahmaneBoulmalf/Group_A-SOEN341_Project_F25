@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import db from "./db.js";
 import session from "express-session";
-// import authMiddleware from "./middleware/authMiddleware.js";
+import authMiddleware from "./middleware/authMiddleware.js";
 import auth from "./accounts/auth.js";
 import events from "./events/events.js";
 import path from "path";
@@ -49,6 +49,9 @@ app.use((req, _, next) => {
 
 app.post("/login", auth.login);
 app.post("/logout", auth.logout);
+app.get("/verify-session", authMiddleware.requireAuth, (_req, res) =>
+  res.json({ success: true })
+);
 
 // Event Routes
 
