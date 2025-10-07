@@ -44,13 +44,15 @@ const Home: React.FC = () => {
                 Login
               </Button>
             </Link>
-            <Button
-              variant="outline"
-              size="lg"
-              className="bg-white hover:bg-slate-100 text-blue-600 font-semibold py-3 px-8 rounded-lg border-2 border-blue-600 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px]"
-            >
-              Sign Up
-            </Button>
+            <Link to="/signup" className="w-full sm:w-auto">
+              <Button
+                variant="outline"
+                size="lg"
+                className="bg-white hover:bg-slate-100 text-blue-600 font-semibold py-3 px-8 rounded-lg border-2 border-blue-600 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px]"
+              >
+                Sign Up
+              </Button>
+            </Link>
           </div>
 
           {/* Feature Cards */}

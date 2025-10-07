@@ -10,6 +10,7 @@ import SavedEvents from "./components/Dashboards/Student/Elements/SavedEvents";
 import Calendar from "./components/Dashboards/Student/Elements/Calendar";
 import Tickets from "./components/Dashboards/Student/Elements/Tickets";
 import Settings from "./components/Dashboards/Student/Elements/Settings";
+import Register from "./pages/Register";
 
 const App: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Register />} />
         <Route path="/events" element={<Events />} />
         <Route element={<ProtectedRoutes />}>
           {/* <Route path="/admin" element={} />
