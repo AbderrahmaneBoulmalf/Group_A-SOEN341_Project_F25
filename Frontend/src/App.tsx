@@ -23,17 +23,15 @@ const App: React.FC = () => {
         <Route element={<ProtectedRoutes />}>
           {/* <Route path="/admin" element={} />
           <Route path="/manager" element={} /> */}
-          <Route path="/student" element={<div>Student Dashboard</div>} />
+          <Route path="student" element={<Layout />}>
+            <Route index element={<SavedEvents />} />
+            <Route path="saved-events" element={<SavedEvents />} />
+            <Route path="calendar" element={<Calendar />} />
+            <Route path="tickets" element={<Tickets />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
         </Route>
         <Route path="/unauthorized" element={<Unauthorized />} />
-        {/* Just for testing the layout. Will move it under protected routes after being able to create accounts */}
-        <Route path="test" element={<Layout />}>
-          <Route index element={<SavedEvents />} />
-          <Route path="saved-events" element={<SavedEvents />} />
-          <Route path="calendar" element={<Calendar />} />
-          <Route path="tickets" element={<Tickets />} />
-          <Route path="settings" element={<Settings />} />
-        </Route>
       </Routes>
     </Router>
   );

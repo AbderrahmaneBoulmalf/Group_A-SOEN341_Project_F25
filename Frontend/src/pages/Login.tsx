@@ -17,10 +17,14 @@ const Login: React.FC = () => {
   const login = async () => {
     setSubmitting(true);
     try {
-      const response = await axios.post("http://localhost:8787/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost:8787/login",
+        {
+          email,
+          password,
+        },
+        { withCredentials: true }
+      );
       if (response.data.success) {
         success();
         //Redirect to dashboard

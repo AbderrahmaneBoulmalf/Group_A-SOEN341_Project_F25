@@ -25,6 +25,12 @@ const Register: React.FC = () => {
   const success = () => {
     messageApi.open({ type: "success", content: "Register successful!" });
   };
+  const successManager = () => {
+    messageApi.open({
+      type: "success",
+      content: "Pending approval for account creation.",
+    });
+  };
 
   // validations
   useEffect(() => {
@@ -58,14 +64,17 @@ const Register: React.FC = () => {
         username,
         accountType,
       });
-      if (response.status !== 201) throw new Error("Unexpected status"); // error check
-      // Redirect based on account type
-      if (accountType === "manager") {
-        navigate("/manager");
-      } else if (accountType === "student") {
-        navigate("/student");
+      if (response.data.success) {
+        success();
+        // Redirect based on account type
+        if (accountType === "manager") {
+          // For managers, redirect to a page indicating pending approval
+          // Do something later
+          successManager();
+        } else if (accountType === "student") {
+          navigate("/login");
+        }
       }
-      success();
     } catch (err) {
       // error handling
       const e = err as AxiosError<{ message?: string }>;
