@@ -6,9 +6,11 @@ import authMiddleware from "./middleware/authMiddleware.js";
 import auth from "./accounts/auth.js";
 import events from "./events/events.js";
 import userService from "./accounts/userService.js";
+import studentEventsController from "./accounts/students/events.js";
 import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
+import { get } from "https";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envPath = path.resolve(__dirname, "../../.env");
@@ -55,6 +57,15 @@ app.get("/verify-session", authMiddleware.requireAuth, (_req, res) =>
   res.status(200).json({ success: true })
 );
 app.get("/user", authMiddleware.requireAuth, userService.getUsername);
+
+// Student Routes
+
+app.get(
+  "/student/saved-events",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("student"),
+  studentEventsController.getSavedEvents
+);
 
 // Event Routes
 
