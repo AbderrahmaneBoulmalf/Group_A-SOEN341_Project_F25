@@ -10,23 +10,23 @@ const Menu: React.FC = () => {
   const location = useLocation();
   const path = location.pathname.toLocaleLowerCase();
   const textMap: { [key: string]: textMapType } = {
-    "/test/calendar": {
+    "/student/calendar": {
       title: "Welcome Back",
       text: "Here's a quick overview of your upcoming events and activities.",
     },
-    "/test/saved-events": {
+    "/student/saved-events": {
       title: "My Saved Events",
       text: "Manage your saved events and access them quickly here.",
     },
-    "/test": {
+    "/student": {
       title: "My Saved Events",
       text: "Manage your saved events and access them quickly here.",
     },
-    "/test/tickets": {
+    "/student/tickets": {
       title: "My Tickets",
       text: "Access and manage your event tickets in one place.",
     },
-    "/test/settings": {
+    "/student/settings": {
       title: "Settings",
       text: "Update your personal information and account settings.",
     },

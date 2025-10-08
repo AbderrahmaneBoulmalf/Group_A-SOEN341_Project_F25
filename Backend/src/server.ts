@@ -5,6 +5,7 @@ import session from "express-session";
 import authMiddleware from "./middleware/authMiddleware.js";
 import auth from "./accounts/auth.js";
 import events from "./events/events.js";
+import userService from "./accounts/userService.js";
 import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
@@ -47,11 +48,13 @@ app.use((req, _, next) => {
 
 // Account Routes
 
+app.post("/register", auth.register);
 app.post("/login", auth.login);
 app.post("/logout", auth.logout);
 app.get("/verify-session", authMiddleware.requireAuth, (_req, res) =>
-  res.json({ success: true })
+  res.status(200).json({ success: true })
 );
+app.get("/user", authMiddleware.requireAuth, userService.getUsername);
 
 // Event Routes
 
