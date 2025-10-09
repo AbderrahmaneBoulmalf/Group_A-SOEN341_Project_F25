@@ -66,6 +66,12 @@ app.get(
   authMiddleware.requireRole("student"),
   studentEventsController.getSavedEvents
 );
+app.post(
+  "/student/unsave-event",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("student"),
+  studentEventsController.unsaveEvent
+);
 
 // Event Routes
 

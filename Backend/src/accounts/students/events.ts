@@ -32,8 +32,52 @@ const getSavedEvents = async (req: Request, res: Response) => {
   }
 };
 
+const unsaveEvent = async (req: Request, res: Response) => {
+  const userId = req.session.userId;
+  const { eventId } = req.body;
+
+  try {
+    const sql = "DELETE FROM SavedEvents WHERE ClientID = ? AND EventID = ?";
+
+    await db.promise().query<any[]>(sql, [userId, eventId]);
+
+    res.status(200).json({
+      success: true,
+      message: "Event unsaved successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: (error as Error).message,
+    });
+  }
+};
+
+const saveEvent = async (req: Request, res: Response) => {
+  const userId = req.session.userId;
+  const { eventId } = req.body;
+
+  try {
+    const sql = "INSERT INTO SavedEvents (ClientID, EventID) VALUES (?, ?)";
+
+    await db.promise().query<any[]>(sql, [userId, eventId]);
+
+    res.status(200).json({
+      success: true,
+      message: "Event saved successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: (error as Error).message,
+    });
+  }
+};
+
 const studentEventsController = {
   getSavedEvents,
+  unsaveEvent,
+  saveEvent,
 };
 
 export default studentEventsController;
