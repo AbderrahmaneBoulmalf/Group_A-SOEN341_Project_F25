@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/navbar";
 import type { Event } from "../types/Event";
+import { useNavigate } from "react-router-dom";
 
 // Helper: build a query string from filters (skips empty values)
 function buildQuery(params: Record<string, string>) {
@@ -14,6 +15,7 @@ function buildQuery(params: Record<string, string>) {
 }
 
 const Events: React.FC = () => {
+  const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +37,7 @@ const Events: React.FC = () => {
 
         const qs = buildQuery({ search, category, dateFrom, dateTo });
         const url =
-          "http://localhost:8787/api/events" + (qs ? `?${qs}` : "");
+          "http://localhost:8080/api/events" + (qs ? `?${qs}` : "");
 
         const resp = await fetch(url, { credentials: "include" });
         if (!resp.ok) throw new Error("Failed to fetch events");
@@ -239,7 +241,12 @@ const Events: React.FC = () => {
                 </p>
               )}
 
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200">
+              <Button
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+                onClick={() =>
+                  navigate(`/events/${event.id}` as const, { state: { event } })
+                }
+              >
                 View Details
               </Button>
             </Card>

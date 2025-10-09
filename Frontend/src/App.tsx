@@ -11,6 +11,7 @@ import Calendar from "./components/Dashboards/Student/Elements/Calendar";
 import Tickets from "./components/Dashboards/Student/Elements/Tickets";
 import Settings from "./components/Dashboards/Student/Elements/Settings";
 import Register from "./pages/Register";
+import EventDetails from "./pages/EventDetails";
 
 const App: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const App: React.FC = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Register />} />
         <Route path="/events" element={<Events />} />
+        <Route path="/events/:id" element={<EventDetails />} />
         <Route element={<ProtectedRoutes />}>
           {/* <Route path="/admin" element={} />
           <Route path="/manager" element={} /> */}

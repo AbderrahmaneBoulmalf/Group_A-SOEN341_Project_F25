@@ -62,7 +62,7 @@ const SavedEvents: React.FC = () => {
   const fetchSavedEvents = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8787/student/saved-events",
+        "http://localhost:8080/student/saved-events",
         { withCredentials: true }
       );
 
@@ -85,7 +85,7 @@ const SavedEvents: React.FC = () => {
   const unsaveEvent = async (eventId: number) => {
     try {
       const response = await axios.post(
-        "http://localhost:8787/student/unsave-event",
+        "http://localhost:8080/student/unsave-event",
         { eventId },
         { withCredentials: true }
       );

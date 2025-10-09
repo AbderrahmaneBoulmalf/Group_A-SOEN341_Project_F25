@@ -58,7 +58,7 @@ const Register: React.FC = () => {
     if (!isFormValid || submitting || !accountType) return;
     setSubmitting(true);
     try {
-      const response = await axios.post("http://localhost:8787/register", {
+      const response = await axios.post("http://localhost:8080/register", {
         email,
         password,
         username,
