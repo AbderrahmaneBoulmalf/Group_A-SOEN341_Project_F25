@@ -1,48 +1,70 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/navbar";
 import type { Event } from "../types/Event";
 
+// Helper: build a query string from filters (skips empty values)
+function buildQuery(params: Record<string, string>) {
+  const qs = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v && v.trim() !== "") qs.append(k, v.trim());
+  });
+  return qs.toString();
+}
+
 const Events: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
-  //Need to do something with these two states
-  //Add loading spinner and error message
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // filters
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+
+  // fetch whenever filters change
   useEffect(() => {
+    let aborted = false;
+
     async function fetchEvents() {
       try {
-        const response = await fetch("http://localhost:8787/api/events", {
-          credentials: "include",
-        });
-        if (!response.ok) {
-          throw new Error("Failed to fetch events");
-        }
-        const data = await response.json();
-        setEvents(data);
+        setLoading(true);
+        setError(null);
+
+        const qs = buildQuery({ search, category, dateFrom, dateTo });
+        const url =
+          "http://localhost:8787/api/events" + (qs ? `?${qs}` : "");
+
+        const resp = await fetch(url, { credentials: "include" });
+        if (!resp.ok) throw new Error("Failed to fetch events");
+
+        const data: Event[] = await resp.json();
+        if (!aborted) setEvents(data);
       } catch (e) {
-        setError("Failed to fetch events");
+        if (!aborted) setError("Failed to fetch events");
       } finally {
-        setLoading(false);
+        if (!aborted) setLoading(false);
       }
     }
-    fetchEvents();
-  }, []);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+    fetchEvents();
+    return () => {
+      aborted = true;
+    };
+  }, [search, category, dateFrom, dateTo]);
+
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
     });
-  };
 
   const getCategoryColor = (category: string) => {
-    const colors: { [key: string]: string } = {
+    const colors: Record<string, string> = {
       Technology: "bg-blue-100 text-blue-800",
       Career: "bg-green-100 text-green-800",
       Cultural: "bg-purple-100 text-purple-800",
@@ -58,7 +80,7 @@ const Events: React.FC = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4 font-poppins">
             Upcoming Events
           </h1>
@@ -66,6 +88,62 @@ const Events: React.FC = () => {
             Discover and join exciting events happening around campus
           </p>
         </div>
+
+        {/* Filters */}
+        <div className="flex flex-wrap gap-3 justify-center mb-10">
+          {/* Search */}
+          <input
+            type="text"
+            placeholder="Search title or description..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="border border-slate-300 rounded-lg px-4 py-2 w-72 outline-none focus:ring-2 focus:ring-blue-300"
+          />
+
+          {/* Category */}
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="border border-slate-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-300"
+          >
+            <option value="">All categories</option>
+            <option value="Technology">Technology</option>
+            <option value="Career">Career</option>
+            <option value="Cultural">Cultural</option>
+            <option value="Academic">Academic</option>
+            <option value="Sports">Sports</option>
+          </select>
+
+          {/* Date From */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-slate-600">From</label>
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="border border-slate-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-300"
+            />
+          </div>
+
+          {/* Date To */}
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-slate-600">To</label>
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="border border-slate-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-300"
+            />
+          </div>
+        </div>
+
+        {/* Loading & Error */}
+        {loading && (
+          <div className="text-center text-slate-600 mb-6">Loading…</div>
+        )}
+        {error && (
+          <div className="text-center text-red-600 mb-6">{error}</div>
+        )}
 
         {/* Events Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -87,12 +165,12 @@ const Events: React.FC = () => {
                 </div>
               )}
 
-              {/* Event Title */}
+              {/* Title */}
               <h3 className="text-xl font-semibold text-slate-800 mb-3 line-clamp-2">
                 {event.title}
               </h3>
 
-              {/* Event Details */}
+              {/* Details */}
               <div className="space-y-3 mb-4">
                 <div className="flex items-center text-slate-600">
                   <svg
@@ -161,7 +239,6 @@ const Events: React.FC = () => {
                 </p>
               )}
 
-              {/* Action Button */}
               <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200">
                 View Details
               </Button>
@@ -170,7 +247,7 @@ const Events: React.FC = () => {
         </div>
 
         {/* Empty State */}
-        {events.length === 0 && (
+        {!loading && events.length === 0 && (
           <div className="text-center py-12">
             <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
@@ -191,7 +268,7 @@ const Events: React.FC = () => {
               No events found
             </h3>
             <p className="text-slate-500">
-              Check back later for upcoming events!
+              Try adjusting your filters or search term.
             </p>
           </div>
         )}
