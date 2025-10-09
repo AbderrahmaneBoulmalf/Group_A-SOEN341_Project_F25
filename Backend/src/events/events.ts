@@ -11,7 +11,27 @@ const getEvents = (req: Request, res: Response) => {
 
   // First, check what columns exist in the events table
   let sql = `
-    SELECT id, title, date, organization, description, location, category
+    SELECT
+      id,
+      title,
+      date,
+      organization,
+      description,
+      location,
+      category,
+      capacity,
+      price,
+      imageUrl,
+      longDescription,
+      requirements,
+      contactEmail,
+      contactPhone,
+      tags,
+      startTime,
+      endTime,
+      registrationDeadline,
+      isOnline,
+      meetingLink
     FROM events
     WHERE 1=1
   `;
