@@ -9,7 +9,7 @@ const ProtectedRoutes: React.FC = () => {
     const verifySession = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8080/verify-session",
+          "http://localhost:8787/verify-session",
           { withCredentials: true }
         );
         if (response.data.success) {

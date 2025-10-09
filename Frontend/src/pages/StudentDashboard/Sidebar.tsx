@@ -22,7 +22,7 @@ const Sidebar: React.FC = () => {
   useEffect(() => {
     const fetchUsername = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/user", {
+        const response = await axios.get("http://localhost:8787/user", {
           withCredentials: true,
         });
         if (response.data.success) {
@@ -39,7 +39,7 @@ const Sidebar: React.FC = () => {
     //Add logout logic here
     try {
       const response = await axios.post(
-        "http://localhost:8080/logout",
+        "http://localhost:8787/logout",
         {},
         { withCredentials: true }
       );

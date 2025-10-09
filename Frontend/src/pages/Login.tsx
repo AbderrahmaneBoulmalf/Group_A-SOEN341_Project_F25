@@ -18,7 +18,7 @@ const Login: React.FC = () => {
     setSubmitting(true);
     try {
       const response = await axios.post(
-        "http://localhost:8080/login",
+        "http://localhost:8787/login",
         {
           email,
           password,

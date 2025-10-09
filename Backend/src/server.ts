@@ -78,6 +78,6 @@ app.post(
 app.get("/api/events", events.getEvents);
 
 // Start server
-app.listen(8080, () => {
-  console.log("Server running on http://localhost:8080");
+app.listen(8787, () => {
+  console.log("Server running on http://localhost:8787");
 });

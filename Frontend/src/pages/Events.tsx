@@ -37,7 +37,7 @@ const Events: React.FC = () => {
 
         const qs = buildQuery({ search, category, dateFrom, dateTo });
         const url =
-          "http://localhost:8080/api/events" + (qs ? `?${qs}` : "");
+          "http://localhost:8787/api/events" + (qs ? `?${qs}` : "");
 
         const resp = await fetch(url, { credentials: "include" });
         if (!resp.ok) throw new Error("Failed to fetch events");

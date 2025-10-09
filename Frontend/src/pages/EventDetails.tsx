@@ -40,7 +40,7 @@ const EventDetails: React.FC = () => {
         setLoading(true);
         setError(null);
         // Backend doesn't expose single-event endpoint; fetch all and pick one
-        const resp = await fetch("http://localhost:8080/api/events", { credentials: "include" });
+        const resp = await fetch("http://localhost:8787/api/events", { credentials: "include" });
         if (!resp.ok) throw new Error("Failed to fetch events");
         const data: Event[] = await resp.json();
         const found = data.find((e) => String(e.id) === String(id)) || null;
