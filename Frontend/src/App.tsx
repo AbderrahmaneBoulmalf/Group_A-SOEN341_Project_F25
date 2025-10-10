@@ -3,6 +3,8 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Events from "./pages/Events";
 import React from "react";
+import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
 import ProtectedRoutes from "./Protected/ProtectedRoutes";
 import Unauthorized from "./Protected/Unauthorized";
 import Layout from "./pages/StudentDashboard/Layout";
@@ -20,6 +22,8 @@ const App: React.FC = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Register />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/contact" element={<ContactUs />} />
         <Route path="/events" element={<Events />} />
         <Route path="/events/:id" element={<EventDetails />} />
         <Route element={<ProtectedRoutes />}>
