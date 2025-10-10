@@ -8,6 +8,9 @@ import Navbar from "@/components/navbar";
 const Home: React.FC = () => {
   const date: number = new Date().getFullYear();
 
+  // Use localStorage to persist login state
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
       <Navbar />
@@ -34,26 +37,39 @@ const Home: React.FC = () => {
             </p>
           </div>
 
-          {/* Login/Signup Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Link to="/login" className="w-full sm:w-auto">
-              <Button
-                size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px] border-0"
-              >
-                Login
-              </Button>
-            </Link>
-            <Link to="/signup" className="w-full sm:w-auto">
-              <Button
-                variant="outline"
-                size="lg"
-                className="bg-white hover:bg-slate-100 text-blue-600 font-semibold py-3 px-8 rounded-lg border-2 border-blue-600 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px]"
-              >
-                Sign Up
-              </Button>
-            </Link>
-          </div>
+          {/* Auth Buttons */}
+          {!isLoggedIn ? (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+              <Link to="/login" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px] border-0"
+                >
+                  Login
+                </Button>
+              </Link>
+              <Link to="/signup" className="w-full sm:w-auto">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="bg-white hover:bg-slate-100 text-blue-600 font-semibold py-3 px-8 rounded-lg border-2 border-blue-600 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px]"
+                >
+                  Sign Up
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="flex justify-center items-center mb-16">
+              <Link to="/student" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-[200px] border-0"
+                >
+                  Your Dashboard
+                </Button>
+              </Link>
+            </div>
+          )}
 
           {/* Feature Cards */}
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">

@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 // import { useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
 import Menu from "./Menu";
 
+
 const Layout: React.FC = () => {
+  useEffect(() => {
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("role", "student");
+  }, []);
+
   //   const location = useLocation();
   return (
     <div className="h-screen w-full overflow-auto bg-gradient-to-br from-slate-50 to-blue-50">
