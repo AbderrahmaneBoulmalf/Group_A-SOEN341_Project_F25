@@ -9,8 +9,29 @@ const getEvents = (req: Request, res: Response) => {
   const { search, category, dateFrom, dateTo } =
     (req.query as Record<string, string>) || {};
 
+  // First, check what columns exist in the events table
   let sql = `
-    SELECT id, title, date, organization, description, location, category
+    SELECT
+      id,
+      title,
+      date,
+      organization,
+      description,
+      location,
+      category,
+      capacity,
+      price,
+      imageUrl,
+      longDescription,
+      requirements,
+      contactEmail,
+      contactPhone,
+      tags,
+      startTime,
+      endTime,
+      registrationDeadline,
+      isOnline,
+      meetingLink
     FROM events
     WHERE 1=1
   `;
@@ -47,7 +68,27 @@ const getEvents = (req: Request, res: Response) => {
       console.error("GET /api/events error:", err);
       return res.status(500).json({ error: "Failed to fetch events" });
     }
-    res.json(results); // unchanged shape so your teammate's frontend keeps working
+    
+    // Process results to add default values for enhanced fields
+    const processedResults = results.map((event: any) => ({
+      ...event,
+      // Add default values for enhanced fields if they don't exist
+      capacity: event.capacity || undefined,
+      price: event.price !== null ? event.price : undefined,
+      imageUrl: event.imageUrl || undefined,
+      longDescription: event.longDescription || undefined,
+      requirements: event.requirements || undefined,
+      contactEmail: event.contactEmail || undefined,
+      contactPhone: event.contactPhone || undefined,
+      tags: event.tags ? (typeof event.tags === 'string' ? JSON.parse(event.tags) : event.tags) : [],
+      startTime: event.startTime || undefined,
+      endTime: event.endTime || undefined,
+      registrationDeadline: event.registrationDeadline || undefined,
+      isOnline: Boolean(event.isOnline),
+      meetingLink: event.meetingLink || undefined,
+    }));
+    
+    res.json(processedResults);
   });
 };
 
