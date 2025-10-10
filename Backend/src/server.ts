@@ -72,6 +72,12 @@ app.post(
   authMiddleware.requireRole("student"),
   studentEventsController.unsaveEvent
 );
+app.post(
+  "/student/saveEvent",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("student"),
+  studentEventsController.saveEvent
+);
 
 // Event Routes
 
