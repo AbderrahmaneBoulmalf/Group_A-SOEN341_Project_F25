@@ -1,15 +1,60 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { logout } from "../pages/StudentDashboard/SidebarIcons";
 import { Card } from "@/components/ui/card";
 import Logo from "@/assets/logo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/navbar";
+import axios from "axios";
+
 
 const Home: React.FC = () => {
   const date: number = new Date().getFullYear();
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const navigate = useNavigate();
+
+  //check backend session
+  useEffect(() => {
+    const verifySession = async () => {
+      try {
+        const response = await axios.get("http://localhost:8787/verify-session", {
+          withCredentials: true,
+        });
+        setIsLoggedIn(response.data.success);
+      } catch (error) {
+        setIsLoggedIn(false);
+      }
+    };
+    verifySession();
+  }, []);
+
+  //logout using backend route
+  const handleLogout = async () => {
+    try {
+      await axios.post("http://localhost:8787/logout", {}, { withCredentials: true });
+      setIsLoggedIn(false);
+      navigate("/"); 
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
+
+  if (isLoggedIn === null) {
+    return <div className="text-center mt-20">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
+      {isLoggedIn && (
+       <button
+    onClick={handleLogout}
+    className="absolute top-4 right-6 flex items-center space-x-1 rounded-md px-3 py-1 text-sm text-red-500 hover:bg-slate-200 font-medium transition-all duration-200"
+  >
+    {logout}
+    <span>Logout</span>
+  </button>
+
+      )}
       <Navbar />
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow">
@@ -34,26 +79,39 @@ const Home: React.FC = () => {
             </p>
           </div>
 
-          {/* Login/Signup Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Link to="/login" className="w-full sm:w-auto">
-              <Button
-                size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px] border-0"
-              >
-                Login
-              </Button>
-            </Link>
-            <Link to="/signup" className="w-full sm:w-auto">
-              <Button
-                variant="outline"
-                size="lg"
-                className="bg-white hover:bg-slate-100 text-blue-600 font-semibold py-3 px-8 rounded-lg border-2 border-blue-600 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px]"
-              >
-                Sign Up
-              </Button>
-            </Link>
-          </div>
+          {/* Auth Buttons */}
+          {!isLoggedIn ? (
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+              <Link to="/login" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px] border-0"
+                >
+                  Login
+                </Button>
+              </Link>
+              <Link to="/signup" className="w-full sm:w-auto">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="bg-white hover:bg-slate-100 text-blue-600 font-semibold py-3 px-8 rounded-lg border-2 border-blue-600 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px]"
+                >
+                  Sign Up
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="flex justify-center items-center mb-16">
+              <Link to="/student" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-[200px] border-0"
+                >
+                  Your Dashboard
+                </Button>
+              </Link>
+            </div>
+          )}
 
           {/* Feature Cards */}
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">

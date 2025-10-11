@@ -37,7 +37,6 @@ const Sidebar: React.FC = () => {
   }, []);
 
   const logOut = async () => {
-    //Add logout logic here
     try {
       const response = await axios.post(
         "http://localhost:8787/logout",
@@ -49,6 +48,8 @@ const Sidebar: React.FC = () => {
       }
     } catch (error) {
       console.error("Logout error:", error);
+      // Still navigate home even if backend fails
+      navigate("/");
     }
   };
 
