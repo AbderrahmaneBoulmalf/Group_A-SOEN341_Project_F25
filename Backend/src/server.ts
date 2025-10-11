@@ -10,7 +10,6 @@ import studentEventsController from "./accounts/students/events.js";
 import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
-import { get } from "https";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envPath = path.resolve(__dirname, "../../.env");
@@ -57,6 +56,22 @@ app.get("/verify-session", authMiddleware.requireAuth, (_req, res) =>
   res.status(200).json({ success: true })
 );
 app.get("/user", authMiddleware.requireAuth, userService.getUsername);
+app.get("/profile", authMiddleware.requireAuth, userService.getProfile);
+app.post(
+  "/profile/changePassword",
+  authMiddleware.requireAuth,
+  userService.changePassword
+);
+app.post(
+  "/profile/update",
+  authMiddleware.requireAuth,
+  userService.updateProfile
+);
+app.post(
+  "/account/deleteAccount",
+  authMiddleware.requireAuth,
+  userService.deleteAccount
+);
 
 // Student Routes
 
