@@ -58,12 +58,28 @@ const saveEvent = async (req: Request, res: Response) => {
   const { eventId } = req.body;
 
   try {
+    const checkSql =
+      "SELECT * FROM SavedEvents WHERE ClientID = ? AND EventID = ?";
+    const [existingEvents] = await db
+      .promise()
+      .query<any[]>(checkSql, [userId, eventId]);
+
+    if (existingEvents.length > 0) {
+      res.status(200).json({
+        success: true,
+        saved: false,
+        message: "Event already saved.",
+      });
+      return;
+    }
+
     const sql = "INSERT INTO SavedEvents (ClientID, EventID) VALUES (?, ?)";
 
     await db.promise().query<any[]>(sql, [userId, eventId]);
 
     res.status(200).json({
       success: true,
+      saved: true,
       message: "Event saved successfully.",
     });
   } catch (error) {

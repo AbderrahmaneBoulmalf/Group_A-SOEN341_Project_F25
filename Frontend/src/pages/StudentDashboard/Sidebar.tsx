@@ -7,6 +7,7 @@ import {
   ticket,
   avatar,
   logout,
+  home,
 } from "./SidebarIcons";
 import { Modal, ConfigProvider, Popover } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
@@ -72,6 +73,16 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
         <ul className="mt-6 grow list-none text-black">
+          <li className="mb-2 text-sm text-gray-800">Navigation</li>
+          <Link to="/">
+            <li
+              id="overview-list"
+              className="mb-1 flex cursor-pointer items-center space-x-3 rounded-lg p-2 hover:bg-[#E5E5E5]"
+            >
+              {home}
+              <p>&nbsp;Home</p>
+            </li>
+          </Link>
           <li className="mb-2 text-sm text-gray-800">Events</li>
           <Link to="/student/calendar">
             <li

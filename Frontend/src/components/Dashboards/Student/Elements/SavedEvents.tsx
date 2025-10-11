@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Spin, Popover, message } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import EmptyEvents from "../SavedEvents/EmptyEvents";
 import { saved } from "@/pages/StudentDashboard/SidebarIcons";
@@ -23,6 +23,7 @@ const SavedEvents: React.FC = () => {
   const [error, setError] = useState<boolean>(false);
   const [isEmpty, setIsEmpty] = useState<boolean>(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const navigate = useNavigate();
 
   const success = () => {
     messageApi.open({
@@ -240,9 +241,13 @@ const SavedEvents: React.FC = () => {
                   <Button
                     size="lg"
                     className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 min-w-[200px] border-0"
+                    onClick={() =>
+                      navigate(`/events/${event.id}` as const, {
+                        state: { event },
+                      })
+                    }
                   >
-                    {/* Only display claim ticket if ticket hasn't been claimed already */}
-                    Claim Ticket
+                    View Details
                   </Button>
                 </div>
               </div>

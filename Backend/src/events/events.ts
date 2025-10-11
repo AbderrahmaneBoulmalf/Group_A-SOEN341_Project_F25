@@ -2,10 +2,7 @@ import type { Request, Response } from "express";
 
 import db from "../db.js";
 
-
 const getEvents = (req: Request, res: Response) => {
-  console.log("[/api/events] query =", req.query);
-
   const { search, category, dateFrom, dateTo } =
     (req.query as Record<string, string>) || {};
 
@@ -68,7 +65,7 @@ const getEvents = (req: Request, res: Response) => {
       console.error("GET /api/events error:", err);
       return res.status(500).json({ error: "Failed to fetch events" });
     }
-    
+
     // Process results to add default values for enhanced fields
     const processedResults = results.map((event: any) => ({
       ...event,
@@ -80,14 +77,18 @@ const getEvents = (req: Request, res: Response) => {
       requirements: event.requirements || undefined,
       contactEmail: event.contactEmail || undefined,
       contactPhone: event.contactPhone || undefined,
-      tags: event.tags ? (typeof event.tags === 'string' ? JSON.parse(event.tags) : event.tags) : [],
+      tags: event.tags
+        ? typeof event.tags === "string"
+          ? JSON.parse(event.tags)
+          : event.tags
+        : [],
       startTime: event.startTime || undefined,
       endTime: event.endTime || undefined,
       registrationDeadline: event.registrationDeadline || undefined,
       isOnline: Boolean(event.isOnline),
       meetingLink: event.meetingLink || undefined,
     }));
-    
+
     res.json(processedResults);
   });
 };
