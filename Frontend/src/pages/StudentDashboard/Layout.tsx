@@ -6,12 +6,7 @@ import Menu from "./Menu";
 
 
 const Layout: React.FC = () => {
-  useEffect(() => {
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("role", "student");
-  }, []);
 
-  //   const location = useLocation();
   return (
     <div className="h-screen w-full overflow-auto bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="flex h-full w-full">

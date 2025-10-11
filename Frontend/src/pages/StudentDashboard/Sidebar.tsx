@@ -36,9 +36,6 @@ const Sidebar: React.FC = () => {
   }, []);
 
   const logOut = async () => {
-    // Clear login state for homepage
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("role");
     try {
       const response = await axios.post(
         "http://localhost:8787/logout",
