@@ -4,7 +4,7 @@ import { Spin, message } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import Navbar from "@/components/navbar";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -13,6 +13,11 @@ const Login: React.FC = () => {
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
   const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const param = new URLSearchParams(location.search);
+  const redirectTo = param.get("redirectTo");
+  const claimEventId = param.get("claimEventId"); // <-- added
 
   const login = async () => {
     setSubmitting(true);
@@ -28,13 +33,30 @@ const Login: React.FC = () => {
       if (response.data.success) {
         success();
         //Redirect to dashboard
+        // const pendingTicketId = localStorage.getItem("pendingTicketId");
+        // if (pendingTicketId) {
+        //   await axios.post(
+        //     "http://localhost:8787/student/claim-ticket",
+        //     { eventId: Number(pendingTicketId) },
+        //     { withCredentials: true }
+        //   );
+        //   localStorage.removeItem("pendingTicketId");
+        // }
         const role: string = response.data.role.toLowerCase();
         if (role === "admin") {
           navigate("/admin");
         } else if (role === "manager") {
           navigate("/manager");
         } else if (role === "student") {
-          navigate("/student");
+          // Preserve claimEventId when redirecting after login
+          let destination = redirectTo || "/student";
+          if (claimEventId) {
+            const hasQuery = destination.includes("?");
+            destination = `${destination}${
+              hasQuery ? "&" : "?"
+            }claimEventId=${encodeURIComponent(claimEventId)}`;
+          }
+          navigate(destination);
         }
       }
     } catch (error: any) {
