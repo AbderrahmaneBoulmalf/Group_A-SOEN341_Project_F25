@@ -15,10 +15,10 @@ function buildQuery(params: Record<string, string>) {
 }
 
 const Events: React.FC = () => {
-  const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   // filters
   const [search, setSearch] = useState("");
@@ -36,8 +36,7 @@ const Events: React.FC = () => {
         setError(null);
 
         const qs = buildQuery({ search, category, dateFrom, dateTo });
-        const url =
-          "http://localhost:8787/api/events" + (qs ? `?${qs}` : "");
+        const url = "http://localhost:8787/api/events" + (qs ? `?${qs}` : "");
 
         const resp = await fetch(url, { credentials: "include" });
         if (!resp.ok) throw new Error("Failed to fetch events");
@@ -64,6 +63,54 @@ const Events: React.FC = () => {
       month: "long",
       day: "numeric",
     });
+
+  const handleClaim = async (eventId: string | number) => {
+    try {
+      // check session on backend
+      const verifyResp = await fetch("http://localhost:8787/verify-session", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (verifyResp.ok) {
+        // logged in -> claim directly
+        const claimResp = await fetch(
+          "http://localhost:8787/student/claim-ticket",
+          {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ eventId: Number(eventId) }),
+          }
+        );
+
+        if (claimResp.ok) {
+          // show student tickets where the newly claimed ticket appears
+          navigate("/student/tickets");
+          return;
+        }
+
+        // if claim returns unauthorized, fall back to login flow
+        if (claimResp.status === 401 || claimResp.status === 403) {
+          navigate(
+            `/login?redirectTo=/student/tickets&claimEventId=${eventId}`
+          );
+          return;
+        }
+
+        // other errors: still navigate student to tickets so they can see current state
+        navigate("/student/tickets");
+        return;
+      } else {
+        // not logged in -> redirect to login and preserve desired claim
+        navigate(`/login?redirectTo=/student/tickets&claimEventId=${eventId}`);
+      }
+    } catch (err) {
+      // network/error fallback to login redirect
+      console.error("Claim flow error:", err);
+      navigate(`/login?redirectTo=/student/tickets&claimEventId=${eventId}`);
+    }
+  };
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
@@ -143,9 +190,7 @@ const Events: React.FC = () => {
         {loading && (
           <div className="text-center text-slate-600 mb-6">Loading…</div>
         )}
-        {error && (
-          <div className="text-center text-red-600 mb-6">{error}</div>
-        )}
+        {error && <div className="text-center text-red-600 mb-6">{error}</div>}
 
         {/* Events Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -248,6 +293,12 @@ const Events: React.FC = () => {
                 }
               >
                 View Details
+              </Button>
+              <Button
+                onClick={() => handleClaim(event.id)}
+                className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+              >
+                Claim Ticket
               </Button>
             </Card>
           ))}

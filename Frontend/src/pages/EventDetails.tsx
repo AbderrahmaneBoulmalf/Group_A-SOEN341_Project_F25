@@ -82,6 +82,55 @@ const EventDetails: React.FC = () => {
 
   const [messageApi, contextHolder] = message.useMessage();
 
+  // Claim ticket flow: if logged in, POST to claim endpoint and navigate to tickets (in the student dashboard)
+  // otherwise redirect to login preserving claimEventId.
+  const handleGetTicket = async (eventId?: string) => {
+    if (!eventId) return;
+    try {
+      // use fetch with credentials (same as Events.tsx) so cookies / session are sent
+      const verifyResp = await fetch("http://localhost:8787/verify-session", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (verifyResp.ok) {
+        // logged in -> claim directly via fetch (send cookies)
+        const claimResp = await fetch(
+          "http://localhost:8787/student/claim-ticket",
+          {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ eventId: Number(eventId) }),
+          }
+        );
+
+        if (claimResp.ok) {
+          messageApi.open({ type: "success", content: "Ticket claimed." });
+          navigate("/student/tickets");
+          return;
+        }
+
+        if (claimResp.status === 401 || claimResp.status === 403) {
+          navigate(
+            `/login?redirectTo=/student/tickets&claimEventId=${eventId}`
+          );
+          return;
+        }
+
+        // other errors: still navigate to tickets to show current state
+        navigate("/student/tickets");
+        return;
+      } else {
+        // not logged in -> redirect to login and preserve desired claim
+        navigate(`/login?redirectTo=/student/tickets&claimEventId=${eventId}`);
+      }
+    } catch (err) {
+      console.error("GetTicket flow error:", err);
+      navigate(`/login?redirectTo=/student/tickets&claimEventId=${eventId}`);
+    }
+  };
+
   const success = () => {
     messageApi.open({
       type: "success",
@@ -437,7 +486,10 @@ const EventDetails: React.FC = () => {
 
               {/* Action Buttons */}
               <div className="mt-6 space-y-3">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3">
+                <Button
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3"
+                  onClick={() => handleGetTicket(id)}
+                >
                   Get Ticket
                 </Button>
                 <Button
