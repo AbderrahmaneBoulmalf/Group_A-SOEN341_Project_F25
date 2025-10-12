@@ -14,6 +14,8 @@ import Tickets from "./components/Dashboards/Student/Elements/Tickets";
 import Settings from "./components/Dashboards/Student/Elements/Settings";
 import Register from "./pages/Register";
 import EventDetails from "./pages/EventDetails";
+import QRCodeGen from "./pages/StudentDashboard/QRCodeGen";
+import QRCodeReader from "./pages/QRReader";
 
 const App: React.FC = () => {
   return (
@@ -26,6 +28,8 @@ const App: React.FC = () => {
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/events" element={<Events />} />
         <Route path="/events/:id" element={<EventDetails />} />
+        <Route path="qr/:eventId" element={<QRCodeGen />} />
+        <Route path="qrreader" element={<QRCodeReader />} />
         <Route element={<ProtectedRoutes />}>
           {/* <Route path="/admin" element={} />
           <Route path="/manager" element={} /> */}
