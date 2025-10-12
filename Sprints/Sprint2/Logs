@@ -8,3 +8,11 @@ Contributions:
 - Designed and implemented the student dashboard with appropriate functionalities (1h)
 - Designed and implemented the saved events page in the student dashboard and implemented saving events logic (2h)
 - Designed and implemented the profile settings page in the student dashboard (2h)
+
+Rafael Lenz
+
+Contributions:
+-Designed and implemented the sign up form for the application (1.5h)
+-Designed and implimented a QR Code generator to the application (3h)
+-Connected the QR Code generator to the website and implemented minimal backend connection (45min)
+-Designed and implemented a QR Code Scanner tool for managers (1.5h)
