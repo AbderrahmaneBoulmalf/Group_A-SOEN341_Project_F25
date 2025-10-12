@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { message } from "antd";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
+import { AxiosError } from "axios";
 import Navbar from "@/components/navbar";
 import { useNavigate } from "react-router-dom";
 
