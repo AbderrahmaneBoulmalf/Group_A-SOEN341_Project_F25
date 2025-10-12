@@ -37,17 +37,13 @@ const Tickets: React.FC = () => {
       try {
         // If we have a claimEventId from redirect after login, attempt to claim it
         if (claimEventId) {
-          // prevent re-processing the same claimEventId in StrictMode double-mount
+          // Prevent re-processing the same claimEventId in StrictMode double-mount
           const processedKey = `claimed_${claimEventId}`;
           if (sessionStorage.getItem(processedKey)) {
             console.log("claimEventId already processed:", claimEventId);
           } else {
             sessionStorage.setItem(processedKey, "1");
             try {
-              console.log(
-                "Attempting POST /student/claim-ticket with eventId:",
-                claimEventId
-              );
               const resp = await axios.post(
                 "http://localhost:8787/student/claim-ticket",
                 { eventId: Number(claimEventId) },
@@ -56,8 +52,7 @@ const Tickets: React.FC = () => {
                   headers: { "Content-Type": "application/json" },
                 }
               );
-              console.log("claim-ticket response:", resp.status, resp.data);
-              console.log("Claimed ticket for eventId:", claimEventId);
+
               // Remove claimEventId from URL so refresh won't re-trigger claim
               navigate(location.pathname, { replace: true });
             } catch (err: any) {
@@ -66,7 +61,6 @@ const Tickets: React.FC = () => {
                 err?.response?.status,
                 err?.response?.data || err.message
               );
-              // ignore claim errors; tickets fetch will still run
             }
           }
         }
@@ -81,7 +75,6 @@ const Tickets: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);
 
-  // format ISO date to a readable date (e.g. "March 15, 2024")
   const formatDate = (iso?: string | null) => {
     if (!iso) return "Unknown date";
     const d = new Date(iso);

@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/navbar";
 import type { Event } from "../types/Event";
 import { useNavigate } from "react-router-dom";
-// import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 // Helper: build a query string from filters (skips empty values)
 function buildQuery(params: Record<string, string>) {
@@ -17,7 +15,6 @@ function buildQuery(params: Record<string, string>) {
 }
 
 const Events: React.FC = () => {
-  const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -69,7 +66,7 @@ const Events: React.FC = () => {
 
   const handleClaim = async (eventId: string | number) => {
     try {
-      // Check session on backend
+      // check session on backend
       const verifyResp = await fetch("http://localhost:8787/verify-session", {
         method: "GET",
         credentials: "include",

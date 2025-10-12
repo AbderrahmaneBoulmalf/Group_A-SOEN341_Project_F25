@@ -17,7 +17,7 @@ const Login: React.FC = () => {
 
   const param = new URLSearchParams(location.search);
   const redirectTo = param.get("redirectTo");
-  const claimEventId = param.get("claimEventId"); // <-- added
+  const claimEventId = param.get("claimEventId");
 
   const login = async () => {
     setSubmitting(true);
@@ -32,16 +32,6 @@ const Login: React.FC = () => {
       );
       if (response.data.success) {
         success();
-        //Redirect to dashboard
-        // const pendingTicketId = localStorage.getItem("pendingTicketId");
-        // if (pendingTicketId) {
-        //   await axios.post(
-        //     "http://localhost:8787/student/claim-ticket",
-        //     { eventId: Number(pendingTicketId) },
-        //     { withCredentials: true }
-        //   );
-        //   localStorage.removeItem("pendingTicketId");
-        // }
         const role: string = response.data.role.toLowerCase();
         if (role === "admin") {
           navigate("/admin");
