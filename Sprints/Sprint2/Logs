@@ -1,6 +1,7 @@
 Sami Erafii
 
 Contributions:
+
 - Initialized Backend folder with nodejs typescript and eslint (10min)
 - Set up managed MySQL database on aiven.io and created database module with access to phpmyadmin via docker (45min)
 - Implemented authentication logic for login, register functions and middleware in the backend (1.5h)
@@ -16,3 +17,13 @@ Contributions:
 -Designed and implimented a QR Code generator to the application (3h)
 -Connected the QR Code generator to the website and implemented minimal backend connection (45min)
 -Designed and implemented a QR Code Scanner tool for managers (1.5h)
+
+Wiame Kotbi
+
+Contributions:
+
+- Designed and implemented the homepage layout (2h)
+- Created the login form with input validation (1h)
+- Implemented authentication logic to dynamically display dashboard or login options based on user session (1h)
+- Designed and implemented the About Us page and the contact us page (1h)
+- Drafted the user story and corresponding tasks for the added core feature (15min)
