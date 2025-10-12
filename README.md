@@ -50,8 +50,8 @@ Administrators will be able to:
 - View global statistics such as number of events, tickets issued, and participation trends.  
 - Manage organizations and assign roles.  
 
-### 4. Additional Feature (TBD)  
-One custom feature will also be implemented, such as:  
-- **Most Popular Events**  
-- **Starting Soon Events**  
-- **Tailored Recommendations**  
+### 4. Additional Feature (Student Event Calendar)  
+Students will be able to:
+- View their upcoming and past events in a calendar format directly from their dashboard.
+- Click on events to view details such as date, time, and location.
+- See both saved and registered events displayed visually for easy tracking.
