@@ -1,1 +1,10 @@
+Sami Erafii
 
+Contributions:
+- Initialized Backend folder with nodejs typescript and eslint (10min)
+- Set up managed MySQL database on aiven.io and created database module with access to phpmyadmin via docker (45min)
+- Implemented authentication logic for login, register functions and middleware in the backend (1.5h)
+- Implemented ProtectedRoutes component to handle control access to dashboards (15min)
+- Designed and implemented the student dashboard with appropriate functionalities (1h)
+- Designed and implemented the saved events page in the student dashboard and implemented saving events logic (2h)
+- Designed and implemented the profile settings page in the student dashboard (2h)
