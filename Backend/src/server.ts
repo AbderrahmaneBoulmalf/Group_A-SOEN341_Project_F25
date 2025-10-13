@@ -193,10 +193,11 @@ app.post(
       }
 
       // Insert into ClaimedTickets table in the db
+      let result;
       try {
         const insertSql =
           "INSERT INTO ClaimedTickets (student_id, event_id) VALUES (?, ?)";
-        const [result] = await db
+        [result] = await db
           .promise()
           .query(insertSql, [studentId, eventId]);
       } catch (dbErr: any) {
@@ -246,6 +247,12 @@ app.post(
 
 // Event Routes
 
+app.post(
+  "/api/events",
+  authMiddleware.requireAuth,
+  
+  events.createEvent
+);
 app.get("/api/events", events.getEvents);
 
 // Start server
