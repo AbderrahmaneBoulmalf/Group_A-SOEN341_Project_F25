@@ -203,7 +203,7 @@ app.post(
         throw dbErr;
       }
 
-      const insertId = (result as any).insertId;
+    
       const [rows] = await db
         .promise()
         .query("SELECT * FROM ClaimedTickets WHERE id = ?", [insertId]);
