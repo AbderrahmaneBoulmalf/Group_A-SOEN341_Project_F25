@@ -10,6 +10,7 @@ import studentEventsController from "./accounts/students/events.js";
 import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
+import passRoute from "./routes/passAuth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envPath = path.resolve(__dirname, "../../.env");
@@ -77,7 +78,6 @@ app.post(
 );
 
 // Student Routes
-
 app.get(
   "/student/tickets",
   authMiddleware.requireAuth,
@@ -112,7 +112,6 @@ app.get(
       let eventsMap: Record<number, any> = {};
 
       if (eventIds.length > 0) {
-        // Try to fetch event details from Events (try two common names)
         const tryFetchEvents = async (tableName: string) => {
           const placeholders = eventIds.map(() => "?").join(",");
           const sql = `SELECT id, title, date, location FROM ${tableName} WHERE id IN (${placeholders})`;
@@ -131,7 +130,6 @@ app.get(
         }
       }
 
-      // Merge claimed tickets with event details (if available)
       const tickets = claimed.map((c: any) => {
         const ev = eventsMap[Number(c.event_id)];
         return {
@@ -156,7 +154,6 @@ app.get(
   }
 );
 
-// Claim a ticket for the logged-in student
 app.post(
   "/student/claim-ticket",
   authMiddleware.requireAuth,
@@ -178,7 +175,6 @@ app.post(
           .json({ success: false, message: "Missing or invalid eventId" });
       }
 
-      // Prevent duplicate claims
       const [existing] = await db
         .promise()
         .query(
@@ -208,14 +204,7 @@ app.post(
         }
         throw dbErr;
       }
-
-      // Retrieve inserted ticket row
-      const insertId = (result as any).insertId;
-      const [rows] = await db
-        .promise()
-        .query("SELECT * FROM ClaimedTickets WHERE id = ?", [insertId]);
-
-      res.status(200).json({ success: true, ticket: (rows as any[])[0] });
+      
     } catch (err) {
       res.status(500).json({
         success: false,
@@ -245,7 +234,8 @@ app.post(
   studentEventsController.saveEvent
 );
 
-// Event Routes
+// Pass Routes
+app.use("/student", passRoute);
 
 app.post(
   "/api/events",
@@ -255,7 +245,7 @@ app.post(
 );
 app.get("/api/events", events.getEvents);
 
-// Start server
+// Start Server
 app.listen(8787, () => {
   console.log("Server running on http://localhost:8787");
 });
