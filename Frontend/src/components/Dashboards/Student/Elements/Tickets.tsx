@@ -10,6 +10,7 @@ const Tickets: React.FC = () => {
   const [error, setError] = useState<boolean>(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const getEventId = (t: any) => t.eventId ?? t.eventID ?? t.event_id ?? t.id;
 
   const fetchTickets = async () => {
     try {
@@ -125,15 +126,37 @@ const Tickets: React.FC = () => {
   return (
     <div className="mb-10 ml-4 mr-4 mt-2">
       <div className="mt-4 flex flex-col gap-y-6">
-        {tickets.map((ticket) => (
-          <div key={ticket.id} className="bg-white rounded-lg shadow p-6">
-            <div className="font-bold">
-              Event: {ticket.eventTitle || "Unknown title"}
+        {tickets.map((ticket) => {
+          const evId = getEventId(ticket);
+          return (
+            <div
+              key={ticket.id ?? evId}
+              className="bg-white rounded-lg shadow p-6"
+            >
+              <div className="font-bold">
+                Event: {ticket.eventTitle || "Unknown title"}
+              </div>
+              <div>Date: {formatDate(ticket.date)}</div>
+              <div>Location: {ticket.location || "Unknown location"}</div>
+
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => navigate(`/qr/${evId}`)}
+                  disabled={!evId}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md disabled:opacity-60"
+                  title={
+                    evId
+                      ? "Open QR generator for this event"
+                      : "No event id available"
+                  }
+                >
+                  Generate QR
+                </button>
+              </div>
             </div>
-            <div>Date: {formatDate(ticket.date)}</div>
-            <div>Location: {ticket.location || "Unknown location"}</div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
