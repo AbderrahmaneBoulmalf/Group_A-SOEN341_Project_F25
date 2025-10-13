@@ -43,7 +43,6 @@ const App: React.FC = () => {
             <Route path="settings" element={<ManagerSettings />} />
           </Route>
           {
-          <Route path="/manager" element={} /> */}
           <Route path="student" element={<Layout />}>
             <Route index element={<SavedEvents />} />
             <Route path="saved-events" element={<SavedEvents />} />
