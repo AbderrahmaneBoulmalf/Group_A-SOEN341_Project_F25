@@ -18,7 +18,7 @@ Contributions:
 -Designed and implimented a QR Code generator to the application (3h)
 -Connected the QR Code generator to the website and implemented minimal backend connection (45min)
 -Designed and implemented a QR Code Scanner tool for managers (1.5h)
--Debugged and Troubleshooted QRCode Code Merging and PR  (45min)
+-Debugged and Troubleshooted QRCode Code Merging and PR (45min)
 
 Wiame Kotbi
 
@@ -55,3 +55,16 @@ Contributions:
 -Tested backend API endpoints using curl to verify filtering and search queries returned correct data (30min)
 -Integrated search and filtering features on the frontend events page, ensuring UI updates dynamically based on query parameters (2h)
 -Wrote the meeting minutes after each team discussion (20min)
+
+Sofian Boutamo
+
+Contributions:
+
+- Implemented the claim ticket button for events (1hour)
+- Updated the database to mark tickets as claimed (1hour)
+
+Abderrahmane Boulmalf
+
+Contributions:
+
+- Attented the meetings (30min)
