@@ -202,13 +202,7 @@ app.post(
         }
         throw dbErr;
       }
-
-    
-      const [rows] = await db
-        .promise()
-        .query("SELECT * FROM ClaimedTickets WHERE id = ?", [insertId]);
-
-      res.status(200).json({ success: true, ticket: (rows as any[])[0] });
+      
     } catch (err) {
       res.status(500).json({
         success: false,
