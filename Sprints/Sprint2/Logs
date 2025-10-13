@@ -13,6 +13,7 @@ Contributions:
 Rafael Lenz
 
 Contributions:
+
 -Designed and implemented the sign up form for the application (1.5h)
 -Designed and implimented a QR Code generator to the application (3h)
 -Connected the QR Code generator to the website and implemented minimal backend connection (45min)
@@ -31,16 +32,25 @@ Contributions:
 Ziad Agha:
 
 Coontributions:
+
 - Designed and implemented Manager Dashboard SidebarIcons and Sidebar links (1h)
 - Designed and implemented Manager Dashboard Menu that will display Manager relevant details (1h)
-
 
 Mohamed Amine Dakli
 
 Contributions:
+
 - Designed and implemented the Event listing page (2h)
 - Designed and implemented the Event details page (2.5h)
 - Added links for the Save events and Claim tickets page (30mins)
 - Created the event table in the database (15 mins)
 - Designed and implemented the Event Creation form in the manager dashboard (2h)
 
+Maria Laghmari
+
+Contributions:
+
+-Implemented backend logic to allow event search by title and description, and filtering by category and date using SQL queries (2h)
+-Tested backend API endpoints using curl to verify filtering and search queries returned correct data (30min)
+-Integrated search and filtering features on the frontend events page, ensuring UI updates dynamically based on query parameters (2h)
+-Wrote the meeting minutes after each team discussion (20min)
