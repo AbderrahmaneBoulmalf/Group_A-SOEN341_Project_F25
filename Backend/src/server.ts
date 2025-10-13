@@ -10,7 +10,6 @@ import studentEventsController from "./accounts/students/events.js";
 import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
-import result from "antd/es/result/index.js";
 import passRoute from "./routes/passAuth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
