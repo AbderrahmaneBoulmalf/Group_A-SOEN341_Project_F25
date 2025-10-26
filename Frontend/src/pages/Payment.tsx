@@ -228,7 +228,7 @@ const Payment: React.FC = () => {
                 value={card}
                 onChange={(e) => setCard(e.target.value)}
                 className="w-full border px-3 py-2 rounded"
-                placeholder="4242424242424242 (mock)"
+                placeholder="1234 5678 9012 3456"
               />
             </div>
             <div className="flex gap-3 mb-3">
