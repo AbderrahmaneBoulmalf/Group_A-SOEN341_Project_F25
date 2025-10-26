@@ -41,10 +41,17 @@ const Login: React.FC = () => {
           // Preserve claimEventId when redirecting after login
           let destination = redirectTo || "/student";
           if (claimEventId) {
-            const hasQuery = destination.includes("?");
-            destination = `${destination}${
-              hasQuery ? "&" : "?"
-            }claimEventId=${encodeURIComponent(claimEventId)}`;
+            // If we are redirecting to the payment page, pass eventId param so Payment reads it
+            if (destination === "/payment") {
+              destination = `/payment?eventId=${encodeURIComponent(
+                claimEventId
+              )}`;
+            } else {
+              const hasQuery = destination.includes("?");
+              destination = `${destination}${
+                hasQuery ? "&" : "?"
+              }claimEventId=${encodeURIComponent(claimEventId)}`;
+            }
           }
           navigate(destination);
         }

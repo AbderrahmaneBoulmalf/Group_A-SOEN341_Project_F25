@@ -65,51 +65,9 @@ const Events: React.FC = () => {
     });
 
   const handleClaim = async (eventId: string | number) => {
-    try {
-      // check session on backend
-      const verifyResp = await fetch("http://localhost:8787/verify-session", {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (verifyResp.ok) {
-        // logged in -> claim directly
-        const claimResp = await fetch(
-          "http://localhost:8787/student/claim-ticket",
-          {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ eventId: Number(eventId) }),
-          }
-        );
-
-        if (claimResp.ok) {
-          // show student tickets where the newly claimed ticket appears
-          navigate("/student/tickets");
-          return;
-        }
-
-        // if claim returns unauthorized, fall back to login flow
-        if (claimResp.status === 401 || claimResp.status === 403) {
-          navigate(
-            `/login?redirectTo=/student/tickets&claimEventId=${eventId}`
-          );
-          return;
-        }
-
-        // other errors: still navigate student to tickets so they can see current state
-        navigate("/student/tickets");
-        return;
-      } else {
-        // not logged in -> redirect to login and preserve desired claim
-        navigate(`/login?redirectTo=/student/tickets&claimEventId=${eventId}`);
-      }
-    } catch (err) {
-      // network/error fallback to login redirect
-      console.error("Claim flow error:", err);
-      navigate(`/login?redirectTo=/student/tickets&claimEventId=${eventId}`);
-    }
+    // Open the payment page (payment page will ensure the user is logged-in)
+    // -> redirecting to /login if needed and perform the server-side "pay and claim"
+    navigate(`/payment?eventId=${encodeURIComponent(String(eventId))}`);
   };
 
   const getCategoryColor = (category: string) => {
