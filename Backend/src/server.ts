@@ -11,6 +11,7 @@ import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import passRoute from "./routes/passAuth.js";
+import exportEventAttendeesCsv from "./events/exportAttendees.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envPath = path.resolve(__dirname, "../../.env");
@@ -237,6 +238,12 @@ app.post(
 // Pass Routes
 app.use("/student", passRoute);
 
+app.get(
+  "/manager/events/:eventId/attendees/export",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("manager"),
+  exportEventAttendeesCsv
+);
 app.post(
   "/api/events",
   authMiddleware.requireAuth,
