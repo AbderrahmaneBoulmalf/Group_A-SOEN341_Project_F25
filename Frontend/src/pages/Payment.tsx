@@ -21,6 +21,7 @@ const Payment: React.FC = () => {
   const [processing, setProcessing] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const processingTimeoutRef = useRef<number | null>(null);
+  const freeClaimAttemptRef = useRef<boolean>(false);
   const PROCESSING_MS = 2500; // milliseconds to show mock processing
 
   // Helper: defer showing messages to avoid "calling notice in render" warning
@@ -51,8 +52,47 @@ const Payment: React.FC = () => {
           return;
         }
 
-        // if we already have event from state, use it
+        // If we already have event from state, use it
         if (event) {
+          // if event is free and we haven't attempted claiming yet, claim it directly
+          if (event.price === 0 && !freeClaimAttemptRef.current) {
+            freeClaimAttemptRef.current = true;
+            try {
+              const resp = await axios.post(
+                "http://localhost:8787/student/claim-ticket",
+                { eventId: Number(eventId) },
+                { withCredentials: true }
+              );
+              if (resp?.data?.success) {
+                const justClaimedToken = resp.data.ticketId ?? Date.now();
+                navigate("/student/tickets", {
+                  state: { justClaimed: justClaimedToken },
+                });
+                return;
+              } else {
+                showMessage({
+                  type: "error",
+                  content: resp?.data?.message || "Unable to claim ticket.",
+                });
+              }
+            } catch (err: any) {
+              if (err?.response?.status === 409) {
+                navigate("/student/tickets", {
+                  state: {
+                    claimError: "already-claimed",
+                    claimEventId: String(eventId),
+                    claimToken: Date.now(),
+                  },
+                });
+                return;
+              } else {
+                showMessage({
+                  type: "error",
+                  content: "Failed to claim free ticket.",
+                });
+              }
+            }
+          }
           setLoading(false);
           return;
         }
@@ -70,6 +110,54 @@ const Payment: React.FC = () => {
           return;
         }
         setEvent(found);
+
+        // if the event is free, immediately claim it (skip payment)
+        if (found.price === 0 && !freeClaimAttemptRef.current) {
+          freeClaimAttemptRef.current = true;
+          try {
+            const claimResp = await axios.post(
+              "http://localhost:8787/student/claim-ticket",
+              { eventId: Number(eventId) },
+              { withCredentials: true }
+            );
+            if (claimResp?.data?.success) {
+              const justClaimedToken = claimResp.data.ticketId ?? Date.now();
+              navigate("/student/tickets", {
+                state: { justClaimed: justClaimedToken },
+              });
+              return;
+            } else {
+              showMessage({
+                type: "error",
+                content: claimResp?.data?.message || "Unable to claim ticket.",
+              });
+            }
+          } catch (err: any) {
+            if (err?.response?.status === 409) {
+              navigate("/student/tickets", {
+                state: {
+                  claimError: "already-claimed",
+                  claimEventId: String(eventId),
+                  claimToken: Date.now(),
+                },
+              });
+              return;
+            } else if (err?.response?.status === 401) {
+              // if session expired, redirect to login preserving claimEventId
+              navigate(
+                `/login?redirectTo=/payment&claimEventId=${encodeURIComponent(
+                  String(eventId)
+                )}`
+              );
+              return;
+            } else {
+              showMessage({
+                type: "error",
+                content: "Failed to claim free ticket.",
+              });
+            }
+          }
+        }
       } catch (err) {
         console.error("Payment load error:", err);
         showMessage({
@@ -88,7 +176,7 @@ const Payment: React.FC = () => {
 
   useEffect(() => {
     return () => {
-      // clear any pending processing timeout on unmount
+      // Clear any pending processing timeout on unmount
       if (processingTimeoutRef.current) {
         clearTimeout(processingTimeoutRef.current);
         processingTimeoutRef.current = null;
@@ -99,7 +187,7 @@ const Payment: React.FC = () => {
   const submitPayment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!eventId) return;
-    // minimal mock validation
+    // Minimal mock validation
     if (!name || card.length < 12 || !exp || cvv.length < 3) {
       showMessage({
         type: "warning",
@@ -124,25 +212,54 @@ const Payment: React.FC = () => {
       );
 
       if (resp.data && resp.data.success) {
-        // show a mock "processing payment" screen for a short time,
+        // Show a mock "processing payment" screen for a short time,
         // then show success and continue the normal flow.
         setSubmitting(false);
         setProcessing(true);
+        // Ensure we send a unique token so Tickets can show a notification per successful claim
+        const justClaimedToken = resp.data.ticketId ?? Date.now();
         processingTimeoutRef.current = window.setTimeout(() => {
-          // navigate to student tickets and indicate a recent claim so Tickets.tsx can show a notification
+          // Navigate to student tickets and indicate a recent claim so Tickets.tsx can show a notification
           setProcessing(false);
-          navigate("/student/tickets", { state: { justClaimed: true } });
+          navigate("/student/tickets", {
+            state: { justClaimed: justClaimedToken },
+          });
         }, PROCESSING_MS);
         return;
       } else {
-        showMessage({ type: "error", content: "Payment/claim failed." });
+        // Prefer any server-provided message, fallback to generic
+        showMessage({
+          type: "error",
+          content: resp.data?.message || "Payment/claim failed.",
+        });
       }
     } catch (err: any) {
       console.error("Payment error:", err?.response || err.message);
-      showMessage({
-        type: "error",
-        content: "Payment failed. Please try again.",
-      });
+
+      // If backend tells us the ticket was already claimed (HTTP 409), surface a clear warning to the user
+      if (err?.response?.status === 409) {
+        navigate("/student/tickets", {
+          state: {
+            claimError: "already-claimed",
+            claimEventId: String(eventId),
+            claimToken: Date.now(),
+          },
+        });
+      } else if (
+        err?.response?.status === 400 &&
+        err?.response?.data?.message
+      ) {
+        // Show backend validation message for bad payment data if present
+        showMessage({
+          type: "warning",
+          content: err.response.data.message,
+        });
+      } else {
+        showMessage({
+          type: "error",
+          content: "Payment failed. Please try again.",
+        });
+      }
     } finally {
       setSubmitting(false);
     }

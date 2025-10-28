@@ -86,8 +86,74 @@ const EventDetails: React.FC = () => {
   // otherwise redirect to login preserving claimEventId.
   const handleGetTicket = async (eventId?: string) => {
     if (!eventId) return;
-    // Navigate to the payment page which handles login redirect and the claim after payment
-    navigate(`/payment?eventId=${encodeURIComponent(String(eventId))}`);
+
+    // If event is free, claim directly
+    const price = event?.price;
+    if (Number(price) === 0) {
+      try {
+        // verify session
+        const v = await fetch("http://localhost:8787/verify-session", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!v.ok) {
+          // not logged in -> redirect to login and preserve claimEventId so Tickets will process it
+          navigate(
+            `/login?redirectTo=/student/tickets&claimEventId=${encodeURIComponent(
+              String(eventId)
+            )}`
+          );
+          return;
+        }
+
+        // logged in -> call claim endpoint
+        const resp = await axios.post(
+          "http://localhost:8787/student/claim-ticket",
+          { eventId: Number(eventId) },
+          { withCredentials: true }
+        );
+
+        if (resp?.data?.success) {
+          const justClaimedToken = resp.data.ticketId ?? Date.now();
+          navigate("/student/tickets", {
+            state: { justClaimed: justClaimedToken },
+          });
+        } else {
+          messageApi.open({
+            type: "error",
+            content: resp?.data?.message || "Unable to claim ticket.",
+          });
+        }
+      } catch (err: any) {
+        if (err?.response?.status === 409) {
+          navigate("/student/tickets", {
+            state: {
+              claimError: "already-claimed",
+              claimEventId: String(eventId),
+              claimToken: Date.now(),
+            },
+          });
+        } else if (err?.response?.status === 401) {
+          navigate(
+            `/login?redirectTo=/student/tickets&claimEventId=${encodeURIComponent(
+              String(eventId)
+            )}`
+          );
+        } else {
+          messageApi.open({
+            type: "error",
+            content: "Failed to claim free ticket. Try again.",
+          });
+          console.error("Claim error:", err?.response || err.message || err);
+        }
+      }
+      return;
+    }
+
+    // Non-free events -> go to payment (keep event in state so Payment can use it)
+    navigate(`/payment?eventId=${encodeURIComponent(String(eventId))}`, {
+      state: { event },
+    });
   };
 
   const success = () => {

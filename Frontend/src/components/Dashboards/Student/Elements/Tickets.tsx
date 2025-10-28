@@ -36,13 +36,17 @@ const Tickets: React.FC = () => {
     const qs = new URLSearchParams(location.search);
     const claimEventId = qs.get("claimEventId");
     const justClaimed = (location.state as any)?.justClaimed;
+    const claimError = (location.state as any)?.claimError;
+    const claimEventIdFromState = (location.state as any)?.claimEventId;
+    const claimToken = (location.state as any)?.claimToken;
 
     const init = async () => {
       setLoading(true);
       try {
         // If we arrived after a payment flow, show a success notification once (guard StrictMode double-mount)
         if (justClaimed) {
-          const shownKey = `justClaimedShown`;
+          // Use a per-claim key so each distinct claim shows its own notification
+          const shownKey = `justClaimedShown_${justClaimed}`;
           if (!sessionStorage.getItem(shownKey)) {
             sessionStorage.setItem(shownKey, "1");
             showMessage({
@@ -51,10 +55,36 @@ const Tickets: React.FC = () => {
             });
           } else {
             console.debug(
-              "justClaimed notification already shown (dev StrictMode guard)"
+              "justClaimed notification already shown for token (dev StrictMode guard):",
+              justClaimed
             );
           }
-          // clear state so refresh doesn't re-show
+          // Clear state so refresh doesn't re-show
+          navigate(location.pathname, { replace: true, state: {} });
+        }
+
+        // If we were navigated here with an explicit claim error (e.g. already claimed),
+        // show it using Tickets' message context so user sees it while on /student/tickets
+        if (claimError) {
+          // Prefer the per-navigation unique token (claimToken) so the same event id
+          // can show the warning repeatedly when retried
+          const shownKey = claimToken
+            ? `claimErrorShown_${claimError}_${claimToken}`
+            : `claimErrorShown_${claimError}_${
+                claimEventIdFromState ?? "generic"
+              }`;
+
+          if (!sessionStorage.getItem(shownKey)) {
+            sessionStorage.setItem(shownKey, "1");
+            showMessage({
+              type: "warning",
+              content:
+                claimError === "already-claimed"
+                  ? "Ticket already claimed."
+                  : String(claimError),
+            });
+          }
+          // Clear state so refresh doesn't re-show
           navigate(location.pathname, { replace: true, state: {} });
         }
 
@@ -119,6 +149,10 @@ const Tickets: React.FC = () => {
                 err?.response?.status,
                 err?.response?.data || err.message
               );
+
+              // Ensure we remove the claimEventId from the URL even on error,
+              // so the user remains on /student/tickets and can see the notification
+              navigate(location.pathname, { replace: true });
             }
           }
         }
