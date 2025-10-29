@@ -7,7 +7,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "test": "jest --passWithNoTests"
   },
   "keywords": [],
   "author": "",
@@ -19,10 +20,14 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/express-session": "^1.18.2",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.6.0",
     "eslint": "^9.36.0",
     "globals": "^16.4.0",
+    "jest": "^30.2.0",
     "jiti": "^2.6.0",
+    "ts-jest": "^29.4.5",
+    "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.45.0"
