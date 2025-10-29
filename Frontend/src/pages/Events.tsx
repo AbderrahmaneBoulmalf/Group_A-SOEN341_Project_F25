@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/navbar";
 import type { Event } from "../types/Event";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { message } from "antd";
 
 // Helper: build a query string from filters (skips empty values)
 function buildQuery(params: Record<string, string>) {
@@ -19,6 +21,8 @@ const Events: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const [messageApi, contextHolder] = message.useMessage();
 
   // filters
   const [search, setSearch] = useState("");
@@ -64,52 +68,73 @@ const Events: React.FC = () => {
       day: "numeric",
     });
 
-  const handleClaim = async (eventId: string | number) => {
-    try {
-      // check session on backend
-      const verifyResp = await fetch("http://localhost:8787/verify-session", {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (verifyResp.ok) {
-        // logged in -> claim directly
-        const claimResp = await fetch(
-          "http://localhost:8787/student/claim-ticket",
-          {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ eventId: Number(eventId) }),
-          }
-        );
-
-        if (claimResp.ok) {
-          // show student tickets where the newly claimed ticket appears
-          navigate("/student/tickets");
-          return;
-        }
-
-        // if claim returns unauthorized, fall back to login flow
-        if (claimResp.status === 401 || claimResp.status === 403) {
+  const handleClaim = async (eventObj: Event) => {
+    // If the event is free, attempt to claim immediately (no payment page)
+    if (Number(eventObj.price) === 0) {
+      try {
+        // verify session
+        const v = await fetch("http://localhost:8787/verify-session", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!v.ok) {
+          // not logged in -> redirect to login and preserve claimEventId so Tickets will process it
           navigate(
-            `/login?redirectTo=/student/tickets&claimEventId=${eventId}`
+            `/login?redirectTo=/student/tickets&claimEventId=${encodeURIComponent(
+              String(eventObj.id)
+            )}`
           );
           return;
         }
 
-        // other errors: still navigate student to tickets so they can see current state
-        navigate("/student/tickets");
-        return;
-      } else {
-        // not logged in -> redirect to login and preserve desired claim
-        navigate(`/login?redirectTo=/student/tickets&claimEventId=${eventId}`);
+        // logged in -> call claim endpoint
+        const resp = await axios.post(
+          "http://localhost:8787/student/claim-ticket",
+          { eventId: Number(eventObj.id) },
+          { withCredentials: true }
+        );
+
+        if (resp?.data?.success) {
+          // navigate to tickets and show a per-claim notification token
+          const justClaimedToken = resp.data.ticketId ?? Date.now();
+          navigate("/student/tickets", {
+            state: { justClaimed: justClaimedToken },
+          });
+        } else {
+          messageApi.open({
+            type: "error",
+            content: resp?.data?.message || "Unable to claim ticket.",
+          });
+        }
+      } catch (err: any) {
+        if (err?.response?.status === 409) {
+          // Include event id + a unique token so Tickets shows the warning every time
+          navigate("/student/tickets", {
+            state: {
+              claimError: "already-claimed",
+              claimEventId: String(eventObj.id),
+              claimToken: Date.now(),
+            },
+          });
+        } else if (err?.response?.status === 401) {
+          navigate(
+            `/login?redirectTo=/student/tickets&claimEventId=${encodeURIComponent(
+              String(eventObj.id)
+            )}`
+          );
+        } else {
+          messageApi.open({
+            type: "error",
+            content: "Failed to claim free ticket. Try again.",
+          });
+          console.error("Claim error:", err?.response || err.message || err);
+        }
       }
-    } catch (err) {
-      // network/error fallback to login redirect
-      console.error("Claim flow error:", err);
-      navigate(`/login?redirectTo=/student/tickets&claimEventId=${eventId}`);
+      return;
     }
+
+    // Non-free events -> existing behavior: open payment page
+    navigate(`/payment?eventId=${encodeURIComponent(String(eventObj.id))}`);
   };
 
   const getCategoryColor = (category: string) => {
@@ -125,8 +150,8 @@ const Events: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      {contextHolder}
       <Navbar />
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="text-center mb-8">
@@ -295,7 +320,7 @@ const Events: React.FC = () => {
                 View Details
               </Button>
               <Button
-                onClick={() => handleClaim(event.id)}
+                onClick={() => handleClaim(event)}
                 className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
               >
                 Claim Ticket
