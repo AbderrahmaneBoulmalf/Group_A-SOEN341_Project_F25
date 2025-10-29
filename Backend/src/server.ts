@@ -194,9 +194,7 @@ app.post(
       try {
         const insertSql =
           "INSERT INTO ClaimedTickets (student_id, event_id) VALUES (?, ?)";
-        [result] = await db
-          .promise()
-          .query(insertSql, [studentId, eventId]);
+        [result] = await db.promise().query(insertSql, [studentId, eventId]);
       } catch (dbErr: any) {
         if (dbErr && dbErr.code === "ER_DUP_ENTRY") {
           return res
@@ -205,7 +203,6 @@ app.post(
         }
         throw dbErr;
       }
-      
     } catch (err) {
       res.status(500).json({
         success: false,
@@ -241,13 +238,13 @@ app.use("/student", passRoute);
 app.get(
   "/manager/events/:eventId/attendees/export",
   authMiddleware.requireAuth,
-  authMiddleware.requireRole("manager"),
+  authMiddleware.requireRole("student"),
   exportEventAttendeesCsv
 );
 app.post(
   "/api/events",
   authMiddleware.requireAuth,
-  
+
   events.createEvent
 );
 app.get("/api/events", events.getEvents);
