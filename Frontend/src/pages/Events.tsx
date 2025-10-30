@@ -29,6 +29,8 @@ const Events: React.FC = () => {
   const [category, setCategory] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  //Most popular Event
+  const [sortByPopularity, setSortByPopularity] = useState(false);
 
   // fetch whenever filters change
   useEffect(() => {
@@ -38,8 +40,14 @@ const Events: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-
-        const qs = buildQuery({ search, category, dateFrom, dateTo });
+        //assuming that the variable isOnline is the attendance
+        const qs = buildQuery({
+          search,
+          category,
+          dateFrom,
+          dateTo,
+          sort: sortByPopularity ? "isOnline" : "",
+        });
         const url = "http://localhost:8787/api/events" + (qs ? `?${qs}` : "");
 
         const resp = await fetch(url, { credentials: "include" });
@@ -58,7 +66,7 @@ const Events: React.FC = () => {
     return () => {
       aborted = true;
     };
-  }, [search, category, dateFrom, dateTo]);
+  }, [search, category, dateFrom, dateTo, sortByPopularity]);
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString("en-US", {
@@ -209,6 +217,17 @@ const Events: React.FC = () => {
               className="border border-slate-300 rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-blue-300"
             />
           </div>
+          <Button
+            onClick={() => setSortByPopularity((prev) => !prev)}
+            className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200
+              ${
+                sortByPopularity
+                  ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                  : "bg-slate-200 hover:bg-slate-300 text-slate-800"
+              }`}
+          >
+            {sortByPopularity ? "Showing Most Popular" : "Most Popular Events"}
+          </Button>
         </div>
 
         {/* Loading & Error */}
