@@ -22,6 +22,14 @@ import QRCodeGen from "./pages/StudentDashboard/QRCodeGen";
 import QRCodeReader from "./pages/QRReader";
 import Payment from "@/pages/Payment";
 
+import AdminLayout    from "./pages/AdminDashboard/Layout";
+import AdminHome      from "./pages/AdminDashboard/Home";
+import ApprovalsPage  from "./pages/AdminDashboard/ApprovalsPage";
+import ModerationPage from "./pages/AdminDashboard/ModerationPage";
+import AnalyticsPage  from "./pages/AdminDashboard/AnalyticsPage";
+import OrgsRolesPage  from "./pages/AdminDashboard/OrgsRolesPage";
+import AdminSettings  from "./pages/AdminDashboard/SettingsPage";
+
 const App: React.FC = () => {
   return (
     <Router>
@@ -37,6 +45,16 @@ const App: React.FC = () => {
         <Route path="qrreader" element={<QRCodeReader />} />
         <Route path="/payment" element={<Payment />} />
         <Route element={<ProtectedRoutes />}>
+          {/* ADMIN */}
+  <Route path="admin" element={<AdminLayout />}>
+    <Route index element={<AdminHome />} />
+    <Route path="approvals"  element={<ApprovalsPage />} />
+    <Route path="moderation" element={<ModerationPage />} />
+    <Route path="analytics"  element={<AnalyticsPage />} />
+    <Route path="orgs-roles" element={<OrgsRolesPage />} />
+    <Route path="settings"   element={<AdminSettings />} />
+  </Route>
+
           {/* <Route path="/admin" element={} />*/}
           <Route path="manager" element={<ManagerLayout />}>
             <Route index element={<MyEvents />} />
