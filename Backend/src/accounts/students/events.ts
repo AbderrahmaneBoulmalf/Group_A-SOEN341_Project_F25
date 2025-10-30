@@ -90,10 +90,40 @@ const saveEvent = async (req: Request, res: Response) => {
   }
 };
 
+const getCalendarEvents = async (req: Request, res: Response) => {
+  const studentId = req.session.userId;
+
+  if (!studentId) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Not authenticated" });
+  }
+
+  try {
+    const sql = "SELECT event_id FROM ClaimedTickets WHERE student_id = ?";
+
+    const [claimedEvents] = await db.promise().query<any[]>(sql, [studentId]);
+
+    const sqlEvents = "SELECT title, date FROM events WHERE id IN (?)";
+
+    const [eventData] = await db
+      .promise()
+      .query<any[]>(sqlEvents, [claimedEvents.map((event) => event.event_id)]);
+
+    res.status(200).json({ success: true, events: eventData });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch calendar events",
+    });
+  }
+};
+
 const studentEventsController = {
   getSavedEvents,
   unsaveEvent,
   saveEvent,
+  getCalendarEvents,
 };
 
 export default studentEventsController;

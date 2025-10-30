@@ -288,6 +288,13 @@ app.post(
 );
 
 app.get(
+  "/student/calendar",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("student"),
+  studentEventsController.getCalendarEvents
+);
+
+app.get(
   "/student/saved-events",
   authMiddleware.requireAuth,
   authMiddleware.requireRole("student"),
