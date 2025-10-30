@@ -18,7 +18,7 @@ const getSavedEvents = async (req: Request, res: Response) => {
       return;
     }
 
-    const eventIds = savedEvents.map((event) => event.EventID);
+    const eventIds = savedEvents.map((event: any) => event.EventID);
 
     const eventsSql = "SELECT * FROM events WHERE id IN (?)";
     const [events] = await db.promise().query<any[]>(eventsSql, [eventIds]);
@@ -104,11 +104,17 @@ const getCalendarEvents = async (req: Request, res: Response) => {
 
     const [claimedEvents] = await db.promise().query<any[]>(sql, [studentId]);
 
+    if (claimedEvents.length === 0) {
+      return res.status(200).json({ success: true, events: [] });
+    }
+
     const sqlEvents = "SELECT title, date FROM events WHERE id IN (?)";
 
     const [eventData] = await db
       .promise()
-      .query<any[]>(sqlEvents, [claimedEvents.map((event) => event.event_id)]);
+      .query<any[]>(sqlEvents, [
+        claimedEvents.map((event: any) => event.event_id),
+      ]);
 
     res.status(200).json({ success: true, events: eventData });
   } catch (error) {
