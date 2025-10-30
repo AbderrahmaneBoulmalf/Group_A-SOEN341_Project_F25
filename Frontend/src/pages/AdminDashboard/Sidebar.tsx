@@ -1,15 +1,15 @@
-// Frontend/src/pages/AdminDashboard/Sidebar.tsx
+import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  HomeIcon,
+  home,
+  settings,
   ApprovalsIcon,
   ModerationIcon,
   OrgsRolesIcon,
   AnalyticsIcon,
-  SettingsIcon,
-  LogoutIcon,
-} from "./SidebarIcons"; 
-import logo from "../../assets/logo.png"; 
+  logout,
+} from "./SidebarIcons";
+import logo from "@/assets/logo.png";
 
 type Item = { to: string; label: string; icon: React.ReactNode };
 
@@ -20,8 +20,8 @@ const NavItem: React.FC<Item> = ({ to, label, icon }) => {
   return (
     <Link to={to}>
       <li
-        className={`mb-1 flex items-center gap-3 rounded-lg p-2 transition ${
-          active ? "bg-blue-600 text-white" : "text-black hover:bg-[#E5E5E5]"
+        className={`mb-1 flex items-center gap-3 rounded-lg p-2 text-sm transition ${
+          active ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-[#E5E5E5]"
         }`}
       >
         <span className="shrink-0">{icon}</span>
@@ -42,7 +42,7 @@ const Sidebar: React.FC = () => {
     }
   };
 
-  const navTop: Item[] = [{ to: "/admin", label: "Home", icon: HomeIcon }];
+  const navTop: Item[] = [{ to: "/admin", label: "Home", icon: home }];
 
   const navManage: Item[] = [
     { to: "/admin/approvals", label: "Approvals", icon: ApprovalsIcon },
@@ -54,42 +54,40 @@ const Sidebar: React.FC = () => {
     { to: "/admin/analytics", label: "Analytics", icon: AnalyticsIcon },
   ];
 
-  const navAccount: Item[] = [
-    { to: "/admin/settings", label: "Settings", icon: SettingsIcon },
-  ];
+  const navAccount: Item[] = [{ to: "/admin/settings", label: "Settings", icon: settings }];
 
   return (
     <div className="w-52 lg:w-64">
-      <aside className="fixed w-52 lg:w-64 min-h-screen bg-white/80 backdrop-blur-md p-4 flex flex-col">
-        
+      <aside className="fixed w-52 lg:w-64 min-h-screen bg-white/80 backdrop-blur-md p-4 flex flex-col text-sm">
+       
         <div className="flex items-center gap-3 p-2">
           <div className="h-10 w-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
             A
           </div>
           <div>
-            <h4 className="font-semibold text-black text-md">Admin</h4>
-            <h6 className="text-xs text-gray-700">Administrator</h6>
+            <h4 className="font-semibold text-black text-sm">Admin</h4>
+            <h6 className="text-xs text-gray-600">Administrator</h6>
           </div>
         </div>
 
        
         <ul className="mt-6 grow list-none">
-          <li className="mb-2 text-sm text-gray-800">Dashboard</li>
+          <li className="mb-2 text-xs text-gray-500">Dashboard</li>
           {navTop.map((it) => (
             <NavItem key={it.to} {...it} />
           ))}
 
-          <li className="mb-2 mt-4 text-sm text-gray-800">Management</li>
+          <li className="mb-2 mt-4 text-xs text-gray-500">Management</li>
           {navManage.map((it) => (
             <NavItem key={it.to} {...it} />
           ))}
 
-          <li className="mb-2 mt-4 text-sm text-gray-800">Insights</li>
+          <li className="mb-2 mt-4 text-xs text-gray-500">Insights</li>
           {navInsights.map((it) => (
             <NavItem key={it.to} {...it} />
           ))}
 
-          <li className="mb-2 mt-4 text-sm text-gray-800">Account</li>
+          <li className="mb-2 mt-4 text-xs text-gray-500">Account</li>
           {navAccount.map((it) => (
             <NavItem key={it.to} {...it} />
           ))}
@@ -98,13 +96,13 @@ const Sidebar: React.FC = () => {
         
         <button
           onClick={handleLogout}
-          className="mt-1 mb-3 flex items-center gap-3 rounded-lg p-2 text-red-600 hover:bg-red-50 transition"
+          className="mt-2 mb-3 flex items-center gap-3 rounded-lg p-2 text-sm text-red-600 hover:bg-red-50 transition"
         >
-          <span className="shrink-0">{LogoutIcon}</span>
+          <span className="shrink-0">{logout}</span>
           <span>Log out</span>
         </button>
 
-        
+       
         <Link to="/" className="flex items-center gap-2 p-2 text-xs text-gray-600">
           <img src={logo} alt="EventHub" className="h-5 w-5" />
           <span>EventHub • admin</span>
