@@ -5,6 +5,7 @@ import session from "express-session";
 import authMiddleware from "./middleware/authMiddleware.js";
 import auth from "./accounts/auth.js";
 import events from "./events/events.js";
+import analytics from "./analytics/analytics.js";
 import userService from "./accounts/userService.js";
 import studentEventsController from "./accounts/students/events.js";
 import path from "path";
@@ -316,6 +317,17 @@ app.post(
   events.createEvent
 );
 app.get("/api/events", events.getEvents);
+
+// Admin analytics (requires admin role)
+app.get(
+  "/api/admin/analytics",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("admin"),
+  analytics.getAnalytics
+);
+
+// Temporary unprotected route for verification only (REMOVE BEFORE MERGE if desired)
+// (removed after verification)
 
 // Start Server
 app.listen(8787, () => {
