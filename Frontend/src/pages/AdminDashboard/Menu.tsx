@@ -21,7 +21,7 @@ const Menu: React.FC = () => {
     },
     "/admin/analytics": {
       title: "Analytics",
-      text: "Track platform KPIs, growth and engagement.",
+      text: "View platform metrics, growth and engagement.",
     },
     "/admin/orgs-roles": {
       title: "Organizations & Roles",
