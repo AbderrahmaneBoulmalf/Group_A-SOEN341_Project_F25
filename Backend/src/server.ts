@@ -54,16 +54,20 @@ app.post("/register", auth.register);
 app.post("/login", auth.login);
 app.post("/logout", auth.logout);
 
-app.get("/verify-session", authMiddleware.requireAuth, (_req, res) =>
-  res.status(200).json({ success: true })
+app.get("/verify-session", authMiddleware.requireAuth, (req, res) =>
+  res.status(200).json({ success: true, role: req.session.role })
 );
+
+
+
 app.get("/user", authMiddleware.requireAuth, userService.getUsername);
 app.get("/profile", authMiddleware.requireAuth, userService.getProfile);
 
 app.get("/session/me", authMiddleware.requireAuth, (req, res) => {
-  const s = (req as any).session || {};
+  const s: any = (req as any).session || {};
   const role = typeof s.role === "string" ? String(s.role).toLowerCase() : null;
-  const statusNum = Number.isFinite(Number(s.status)) ? Number(s.status) : null;
+  const statusNum =
+    Number.isFinite(Number(s.status)) ? Number(s.status) : null;
   res.status(200).json({
     success: true,
     user: {

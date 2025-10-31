@@ -101,8 +101,6 @@ const login = async (req: Request, res: Response): Promise<void> => {
 
     const s: any = (req as any).session;
     s.userId = user.ID ?? null;
-    s.username = user.Username ?? null;
-    s.email = user.Email ?? null;
     s.role = role;
     s.status = status;
 

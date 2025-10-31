@@ -72,9 +72,9 @@ const CreateEvents: React.FC = () => {
           withCredentials: true,
         });
         if (!mounted) return;
-        const r = data?.user?.role;
+        const r = data?.user?.role ?? null;
         const s = data?.user?.status;
-        setRole(typeof r === "string" ? r.toLowerCase() : null);
+        setRole(r);
         setManagerStatus(Number.isFinite(Number(s)) ? Number(s) : null);
       } finally {
         if (mounted) setLoadingProfile(false);
@@ -85,6 +85,8 @@ const CreateEvents: React.FC = () => {
     };
   }, []);
 
+  const isPending = role === "manager" && managerStatus === 0;
+  const isRejected = role === "manager" && managerStatus === 2;
   const isBlocked = role === "manager" && managerStatus !== 1;
 
   const requiredFields = useMemo<readonly (keyof EventFormData)[]>(
@@ -162,7 +164,11 @@ const CreateEvents: React.FC = () => {
     event.preventDefault();
 
     if (isBlocked) {
-      messageApi.warning("Your account is awaiting admin approval. You can’t create events yet.");
+      const m =
+        isRejected
+          ? "Your manager access has been denied. Please contact an administrator for details."
+          : "Your account is awaiting admin approval. You can’t create events yet.";
+      messageApi.warning(m);
       return;
     }
 
@@ -216,8 +222,18 @@ const CreateEvents: React.FC = () => {
       {contextHolder}
 
       {isBlocked && !loadingProfile && (
-        <div className="mb-6 w-full max-w-5xl rounded-lg border border-amber-300 bg-amber-50 p-3 text-center text-amber-800">
-          Your manager account is <b>pending admin approval</b>. You can browse the dashboard, but creating events is disabled for now.
+        <div
+          className={`mb-6 w-full max-w-5xl rounded-lg p-3 text-center ${
+            isRejected
+              ? "border-red-300 bg-red-50 text-red-800"
+              : "border-amber-300 bg-amber-50 text-amber-800"
+          } border`}
+        >
+          {isRejected ? (
+            <>Your manager access was <b>denied</b>. Please contact an administrator for more information.</>
+          ) : (
+            <>Your manager account is <b>pending admin approval</b>. You can browse the dashboard, but creating events is disabled for now.</>
+          )}
         </div>
       )}
 
@@ -542,7 +558,7 @@ const CreateEvents: React.FC = () => {
                 Reset
               </Button>
               <Button type="submit" className="px-6 py-2" disabled={isSubmitting || isBlocked}>
-                {isBlocked ? "Waiting for approval..." : isSubmitting ? "Submitting..." : "Create Event"}
+                {isBlocked ? "Access restricted" : isSubmitting ? "Submitting..." : "Create Event"}
               </Button>
             </div>
           </fieldset>
