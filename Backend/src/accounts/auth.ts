@@ -112,9 +112,15 @@ const login = async (req: Request, res: Response): Promise<void> => {
         return;
       }
       const base = { success: true, role, status };
-      if (role === "manager" && status !== 1) {
-        res.status(200).json({ ...base, message: "Login successful (manager pending approval)" });
-        return;
+      if (role === "manager") {
+        if (status === 0) {
+          res.status(200).json({ ...base, message: "Login successful (manager pending approval)" });
+          return;
+        }
+        if (status === 2) {
+          res.status(200).json({ ...base, message: "Login successful (manager access denied)" });
+          return;
+        }
       }
       res.status(200).json({ ...base, message: "Login successful" });
     });
