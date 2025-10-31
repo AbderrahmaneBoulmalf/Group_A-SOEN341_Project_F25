@@ -57,8 +57,8 @@ app.use((req, _, next) => {
 app.post("/register", auth.register);
 app.post("/login", auth.login);
 app.post("/logout", auth.logout);
-app.get("/verify-session", authMiddleware.requireAuth, (_req, res) =>
-  res.status(200).json({ success: true })
+app.get("/verify-session", authMiddleware.requireAuth, (req, res) =>
+  res.status(200).json({ success: true, role: req.session.role })
 );
 app.get("/user", authMiddleware.requireAuth, userService.getUsername);
 app.get("/profile", authMiddleware.requireAuth, userService.getProfile);
@@ -194,9 +194,10 @@ app.post(
       try {
         const insertSql =
           "INSERT INTO ClaimedTickets (student_id, event_id) VALUES (?, ?)";
-        [result] = await db
+        const [insertResult] = await db
           .promise()
           .query(insertSql, [studentId, eventId]);
+        result = insertResult;
       } catch (dbErr: any) {
         if (dbErr && dbErr.code === "ER_DUP_ENTRY") {
           return res
@@ -205,7 +206,13 @@ app.post(
         }
         throw dbErr;
       }
-      
+
+      // Send success response so frontend gets immediate confirmation
+      return res.status(200).json({
+        success: true,
+        message: "Ticket claimed",
+        ticketId: result.insertId ?? null,
+      });
     } catch (err) {
       res.status(500).json({
         success: false,
@@ -279,6 +286,13 @@ app.post(
       });
     }
   }
+);
+
+app.get(
+  "/student/calendar",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("student"),
+  studentEventsController.getCalendarEvents
 );
 
 app.get(
