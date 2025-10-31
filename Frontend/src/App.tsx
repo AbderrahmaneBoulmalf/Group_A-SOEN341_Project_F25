@@ -22,13 +22,14 @@ import QRCodeGen from "./pages/StudentDashboard/QRCodeGen";
 import QRCodeReader from "./pages/QRReader";
 import Payment from "@/pages/Payment";
 
-import AdminLayout    from "./pages/AdminDashboard/Layout";
-import AdminHome      from "./pages/AdminDashboard/Home";
-import ApprovalsPage  from "./pages/AdminDashboard/ApprovalsPage";
+import AdminLayout from "./pages/AdminDashboard/Layout";
+import AdminHome from "./pages/AdminDashboard/Home";
+import ApprovalsPage from "./pages/AdminDashboard/ApprovalsPage";
 import ModerationPage from "./pages/AdminDashboard/ModerationPage";
-import AnalyticsPage  from "./pages/AdminDashboard/AnalyticsPage";
-import OrgsRolesPage  from "./pages/AdminDashboard/OrgsRolesPage";
-import AdminSettings  from "./pages/AdminDashboard/SettingsPage";
+import AnalyticsPage from "./pages/AdminDashboard/AnalyticsPage";
+import OrgsRolesPage from "./pages/AdminDashboard/OrgsRolesPage";
+import AdminSettings from "./pages/AdminDashboard/SettingsPage";
+import EventAnalytics from "./components/Dashboards/Manager/Elements/EventAnalytics";
 
 const App: React.FC = () => {
   return (
@@ -46,14 +47,14 @@ const App: React.FC = () => {
         <Route path="/payment" element={<Payment />} />
         <Route element={<ProtectedRoutes />}>
           {/* ADMIN */}
-  <Route path="admin" element={<AdminLayout />}>
-    <Route index element={<AdminHome />} />
-    <Route path="approvals"  element={<ApprovalsPage />} />
-    <Route path="moderation" element={<ModerationPage />} />
-    <Route path="analytics"  element={<AnalyticsPage />} />
-    <Route path="orgs-roles" element={<OrgsRolesPage />} />
-    <Route path="settings"   element={<AdminSettings />} />
-  </Route>
+          <Route path="admin" element={<AdminLayout />}>
+            <Route index element={<AdminHome />} />
+            <Route path="approvals" element={<ApprovalsPage />} />
+            <Route path="moderation" element={<ModerationPage />} />
+            <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="orgs-roles" element={<OrgsRolesPage />} />
+            <Route path="settings" element={<AdminSettings />} />
+          </Route>
 
           {/* <Route path="/admin" element={} />*/}
           <Route path="manager" element={<ManagerLayout />}>
@@ -61,6 +62,7 @@ const App: React.FC = () => {
             <Route path="my-events" element={<MyEvents />} />
             <Route path="create-events" element={<CreateEvents />} />
             <Route path="settings" element={<ManagerSettings />} />
+            <Route path="event/:id" element={<EventAnalytics />} />
           </Route>
 
           <Route path="student" element={<Layout />}>

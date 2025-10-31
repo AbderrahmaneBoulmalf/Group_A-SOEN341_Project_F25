@@ -27,10 +27,20 @@ const Menu: React.FC = () => {
       title: "My Events",
       text: "Here's a quick overview of all your scheduled events.",
     },
+    "/manager/event/:id": {
+      title: "My Events",
+      text: "View detailed analytics for this event",
+    },
   };
 
-  // Fallback if path not found
-  const title: textMapType = textMap[path] || { title: "Page Not Found", text: "" };
+  // Handle dynamic event analytics route
+  const isAnalyticsPage = path.startsWith("/manager/event/");
+  const title: textMapType = isAnalyticsPage
+    ? {
+        title: "My Events",
+        text: "View detailed analytics for this event",
+      }
+    : textMap[path] || { title: "Page Not Found", text: "" };
 
   return (
     <div className="ml-4 mr-4 mt-4">

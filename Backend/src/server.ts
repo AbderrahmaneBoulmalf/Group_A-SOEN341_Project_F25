@@ -323,6 +323,13 @@ app.get(
   authMiddleware.requireRole("student"),
   exportEventAttendeesCsv
 );
+app.get(
+  "/manager/event/:id/analytics",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("manager"),
+  events.getEventAnalytics
+);
+
 app.post(
   "/api/events",
   authMiddleware.requireAuth,
