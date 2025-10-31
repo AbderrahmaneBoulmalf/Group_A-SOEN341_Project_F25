@@ -68,15 +68,14 @@ const CreateEvents: React.FC = () => {
     let mounted = true;
     (async () => {
       try {
-        const { data } = await axios.get("http://localhost:8787/profile", {
+        const { data } = await axios.get("http://localhost:8787/session/me", {
           withCredentials: true,
         });
         if (!mounted) return;
-        const r = data?.role ?? data?.profile?.role ?? null;
-        const sRaw = data?.status ?? data?.profile?.status ?? null;
-        setRole(r);
-        setManagerStatus(typeof sRaw === "number" ? sRaw : null);
-      } catch {
+        const r = data?.user?.role;
+        const s = data?.user?.status;
+        setRole(typeof r === "string" ? r.toLowerCase() : null);
+        setManagerStatus(Number.isFinite(Number(s)) ? Number(s) : null);
       } finally {
         if (mounted) setLoadingProfile(false);
       }
@@ -202,8 +201,7 @@ const CreateEvents: React.FC = () => {
 
       messageApi.success("Event created successfully.");
       resetForm();
-    } catch (error) {
-      console.error("Error creating event:", error);
+    } catch {
       messageApi.error("Failed to create event. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -213,25 +211,23 @@ const CreateEvents: React.FC = () => {
   const inputStyles =
     "w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-slate-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200";
 
-    return (
-      <div className="ml-4 mr-4 mt-2 mb-10 flex flex-col items-center overflow-y-auto">
-        {contextHolder}
-    
-        {isBlocked && !loadingProfile && (
-          <div className="mb-6 w-full max-w-5xl rounded-lg border border-amber-300 bg-amber-50 p-3 text-center text-amber-800">
-            Your manager account is <b>pending admin approval</b>. You can browse the dashboard,
-            but creating events is disabled for now.
-          </div>
-        )}
-    
-        <div className="w-full max-w-5xl rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-          <header className="mb-6">
-            <h1 className="text-2xl font-semibold text-slate-900">Create a New Event</h1>
-            <p className="mt-2 text-sm text-slate-500">
-              Provide the details below. Fields marked as required must be completed before submission.
-            </p>
-          </header>
-    
+  return (
+    <div className="ml-4 mr-4 mt-2 mb-10 flex flex-col items-center overflow-y-auto">
+      {contextHolder}
+
+      {isBlocked && !loadingProfile && (
+        <div className="mb-6 w-full max-w-5xl rounded-lg border border-amber-300 bg-amber-50 p-3 text-center text-amber-800">
+          Your manager account is <b>pending admin approval</b>. You can browse the dashboard, but creating events is disabled for now.
+        </div>
+      )}
+
+      <div className="w-full max-w-5xl rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+        <header className="mb-6">
+          <h1 className="text-2xl font-semibold text-slate-900">Create a New Event</h1>
+          <p className="mt-2 text-sm text-slate-500">
+            Provide the details below. Fields marked as required must be completed before submission.
+          </p>
+        </header>
 
         <form onSubmit={handleSubmit} className="space-y-8">
           <fieldset disabled={isBlocked}>
@@ -553,8 +549,7 @@ const CreateEvents: React.FC = () => {
         </form>
 
         <p className="mt-4 text-xs text-slate-500">
-          * Required fields. Tags are stored as comma separated values and will be parsed into individual keywords on
-          submission.
+          * Required fields. Tags are stored as comma separated values and will be parsed into individual keywords on submission.
         </p>
       </div>
     </div>

@@ -1,4 +1,3 @@
-
 import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import path from "path";
@@ -78,7 +77,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     const [rows]: any = await db.promise().query(
-      "SELECT * FROM Users WHERE Email = ? LIMIT 1",
+      "SELECT ID, Username, Email, Hash, Role, Status FROM Users WHERE Email = ? LIMIT 1",
       [email]
     );
     const user = rows?.[0];
@@ -93,29 +92,31 @@ const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const isManager = user.Role === "manager";
-    if (!isManager && user.Status !== 1) {
+    const role = String(user.Role || "").toLowerCase();
+    const status = Number.isFinite(Number(user.Status)) ? Number(user.Status) : null;
+    if (role !== "manager" && status !== 1) {
       res.status(403).json({ success: false, message: "User account is not active." });
       return;
     }
 
-    const session: any = (req as any).session;
-    session.userId = user.ID;
-    session.role = user.Role;
+    const s: any = (req as any).session;
+    s.userId = user.ID ?? null;
+    s.username = user.Username ?? null;
+    s.email = user.Email ?? null;
+    s.role = role;
+    s.status = status;
 
-    session.save((e: any) => {
+    s.save((e: any) => {
       if (e) {
         res.status(500).json({ success: false, message: "Session save failed", error: e?.message });
         return;
       }
-      res.status(200).json({
-        success: true,
-        message: isManager && user.Status === 0
-          ? "Login successful (manager pending approval)"
-          : "Login successful",
-        role: user.Role,
-        status: user.Status,
-      });
+      const base = { success: true, role, status };
+      if (role === "manager" && status !== 1) {
+        res.status(200).json({ ...base, message: "Login successful (manager pending approval)" });
+        return;
+      }
+      res.status(200).json({ ...base, message: "Login successful" });
     });
   } catch (err: any) {
     res.status(500).json({ success: false, message: err?.message || "Login failed" });

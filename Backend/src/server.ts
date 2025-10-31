@@ -43,7 +43,6 @@ app.use(
   })
 );
 
-
 app.use((req, _res, next) => {
   (req as any).session?.touch?.();
   next();
@@ -51,11 +50,9 @@ app.use((req, _res, next) => {
 
 console.log("Database module imported:", db ? "success" : "failed");
 
-
 app.post("/register", auth.register);
 app.post("/login", auth.login);
 app.post("/logout", auth.logout);
-
 
 app.get("/verify-session", authMiddleware.requireAuth, (_req, res) =>
   res.status(200).json({ success: true })
@@ -63,6 +60,21 @@ app.get("/verify-session", authMiddleware.requireAuth, (_req, res) =>
 app.get("/user", authMiddleware.requireAuth, userService.getUsername);
 app.get("/profile", authMiddleware.requireAuth, userService.getProfile);
 
+app.get("/session/me", authMiddleware.requireAuth, (req, res) => {
+  const s = (req as any).session || {};
+  const role = typeof s.role === "string" ? String(s.role).toLowerCase() : null;
+  const statusNum = Number.isFinite(Number(s.status)) ? Number(s.status) : null;
+  res.status(200).json({
+    success: true,
+    user: {
+      id: s.userId ?? null,
+      username: s.username ?? null,
+      email: s.email ?? null,
+      role,
+      status: statusNum,
+    },
+  });
+});
 
 app.post(
   "/profile/changePassword",
@@ -80,7 +92,6 @@ app.post(
   userService.deleteAccount
 );
 
-// student features
 app.get(
   "/student/tickets",
   authMiddleware.requireAuth,
@@ -257,7 +268,6 @@ app.post(
   }
 );
 
-// student saved events
 app.get(
   "/student/saved-events",
   authMiddleware.requireAuth,
@@ -277,9 +287,7 @@ app.post(
   studentEventsController.saveEvent
 );
 
-
 app.use("/student", passRoute);
-
 
 app.use(
   "/admin/organizers",
@@ -288,7 +296,6 @@ app.use(
   adminOrganizers
 );
 
-
 app.post(
   "/api/events",
   authMiddleware.requireAuth,
@@ -296,7 +303,6 @@ app.post(
   events.createEvent
 );
 app.get("/api/events", events.getEvents);
-
 
 app.get(
   "/api/events/:eventId/attendees/export",
