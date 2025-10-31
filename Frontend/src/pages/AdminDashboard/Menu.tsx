@@ -25,7 +25,7 @@ const Menu: React.FC = () => {
     },
     "/admin/orgs-roles": {
       title: "Organizations & Roles",
-      text: "Manage organizations and assign roles.",
+      text: "Moderate organizational accounts and manage user roles.",
     },
     "/admin/settings": {
       title: "Settings",
