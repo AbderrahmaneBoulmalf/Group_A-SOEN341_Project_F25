@@ -326,9 +326,6 @@ app.get(
   analytics.getAnalytics
 );
 
-// Temporary unprotected route for verification only (REMOVE BEFORE MERGE if desired)
-// (removed after verification)
-
 // Start Server
 app.listen(8787, () => {
   console.log("Server running on http://localhost:8787");
