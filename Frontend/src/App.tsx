@@ -20,6 +20,7 @@ import CreateEvents from "./components/Dashboards/Manager/Elements/CreateEvents"
 import ManagerSettings from "./components/Dashboards/Manager/Elements/Settings";
 import QRCodeGen from "./pages/StudentDashboard/QRCodeGen";
 import QRCodeReader from "./pages/QRReader";
+import Payment from "@/pages/Payment";
 
 const App: React.FC = () => {
   return (
@@ -34,6 +35,7 @@ const App: React.FC = () => {
         <Route path="/events/:id" element={<EventDetails />} />
         <Route path="qr/:eventId" element={<QRCodeGen />} />
         <Route path="qrreader" element={<QRCodeReader />} />
+        <Route path="/payment" element={<Payment />} />
         <Route element={<ProtectedRoutes />}>
           {/* <Route path="/admin" element={} />*/}
           <Route path="manager" element={<ManagerLayout />}>

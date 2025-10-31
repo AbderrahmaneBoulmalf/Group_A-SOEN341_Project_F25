@@ -190,11 +190,13 @@ app.post(
       }
 
       // Insert into ClaimedTickets table in the db
-      let result;
+      let result: any;
       try {
         const insertSql =
           "INSERT INTO ClaimedTickets (student_id, event_id) VALUES (?, ?)";
-        [result] = await db.promise().query(insertSql, [studentId, eventId]);
+        [result] = await db
+          .promise()
+          .query(insertSql, [studentId, eventId]);
       } catch (dbErr: any) {
         if (dbErr && dbErr.code === "ER_DUP_ENTRY") {
           return res
@@ -203,10 +205,76 @@ app.post(
         }
         throw dbErr;
       }
+      
     } catch (err) {
       res.status(500).json({
         success: false,
         message: "Failed to claim ticket",
+        error: (err as Error).message,
+      });
+    }
+  }
+);
+
+// Mock payment endpoint that creates a claimed ticket after "payment"
+app.post(
+  "/student/pay-and-claim",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("student"),
+  async (req, res) => {
+    try {
+      const studentId = req.session.userId;
+      const { eventId, payment } = req.body;
+
+      if (!studentId) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Not authenticated" });
+      }
+      if (!eventId || isNaN(Number(eventId))) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Missing or invalid eventId" });
+      }
+
+      // (Optional) minimal mock payment validation
+      if (!payment || !payment.card || String(payment.card).length < 12) {
+        // For mock flow fail fast
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid payment info" });
+      }
+
+      const [existing] = await db
+        .promise()
+        .query(
+          "SELECT * FROM ClaimedTickets WHERE student_id = ? AND event_id = ?",
+          [studentId, eventId]
+        );
+
+      if ((existing as any[]).length > 0) {
+        return res
+          .status(409)
+          .json({ success: false, message: "Ticket already claimed" });
+      }
+
+      // Insert into ClaimedTickets table
+      const insertSql =
+        "INSERT INTO ClaimedTickets (student_id, event_id) VALUES (?, ?)";
+      const [insertResult] = await db
+        .promise()
+        .query(insertSql, [studentId, eventId]);
+
+      return res.status(200).json({
+        success: true,
+        message: "Payment accepted, ticket claimed",
+        ticketId: (insertResult as any).insertId ?? null,
+      });
+    } catch (err) {
+      console.error("pay-and-claim error:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to process payment/claim",
         error: (err as Error).message,
       });
     }

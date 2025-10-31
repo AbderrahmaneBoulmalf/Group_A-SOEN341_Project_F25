@@ -86,49 +86,74 @@ const EventDetails: React.FC = () => {
   // otherwise redirect to login preserving claimEventId.
   const handleGetTicket = async (eventId?: string) => {
     if (!eventId) return;
-    try {
-      // use fetch with credentials (same as Events.tsx) so cookies / session are sent
-      const verifyResp = await fetch("http://localhost:8787/verify-session", {
-        method: "GET",
-        credentials: "include",
-      });
 
-      if (verifyResp.ok) {
-        // logged in -> claim directly via fetch (send cookies)
-        const claimResp = await fetch(
-          "http://localhost:8787/student/claim-ticket",
-          {
-            method: "POST",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ eventId: Number(eventId) }),
-          }
-        );
-
-        if (claimResp.ok) {
-          messageApi.open({ type: "success", content: "Ticket claimed." });
-          navigate("/student/tickets");
-          return;
-        }
-
-        if (claimResp.status === 401 || claimResp.status === 403) {
+    // If event is free, claim directly
+    const price = event?.price;
+    if (Number(price) === 0) {
+      try {
+        // verify session
+        const v = await fetch("http://localhost:8787/verify-session", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!v.ok) {
+          // not logged in -> redirect to login and preserve claimEventId so Tickets will process it
           navigate(
-            `/login?redirectTo=/student/tickets&claimEventId=${eventId}`
+            `/login?redirectTo=/student/tickets&claimEventId=${encodeURIComponent(
+              String(eventId)
+            )}`
           );
           return;
         }
 
-        // other errors: still navigate to tickets to show current state
-        navigate("/student/tickets");
-        return;
-      } else {
-        // not logged in -> redirect to login and preserve desired claim
-        navigate(`/login?redirectTo=/student/tickets&claimEventId=${eventId}`);
+        // logged in -> call claim endpoint
+        const resp = await axios.post(
+          "http://localhost:8787/student/claim-ticket",
+          { eventId: Number(eventId) },
+          { withCredentials: true }
+        );
+
+        if (resp?.data?.success) {
+          const justClaimedToken = resp.data.ticketId ?? Date.now();
+          navigate("/student/tickets", {
+            state: { justClaimed: justClaimedToken },
+          });
+        } else {
+          messageApi.open({
+            type: "error",
+            content: resp?.data?.message || "Unable to claim ticket.",
+          });
+        }
+      } catch (err: any) {
+        if (err?.response?.status === 409) {
+          navigate("/student/tickets", {
+            state: {
+              claimError: "already-claimed",
+              claimEventId: String(eventId),
+              claimToken: Date.now(),
+            },
+          });
+        } else if (err?.response?.status === 401) {
+          navigate(
+            `/login?redirectTo=/student/tickets&claimEventId=${encodeURIComponent(
+              String(eventId)
+            )}`
+          );
+        } else {
+          messageApi.open({
+            type: "error",
+            content: "Failed to claim free ticket. Try again.",
+          });
+          console.error("Claim error:", err?.response || err.message || err);
+        }
       }
-    } catch (err) {
-      console.error("GetTicket flow error:", err);
-      navigate(`/login?redirectTo=/student/tickets&claimEventId=${eventId}`);
+      return;
     }
+
+    // Non-free events -> go to payment (keep event in state so Payment can use it)
+    navigate(`/payment?eventId=${encodeURIComponent(String(eventId))}`, {
+      state: { event },
+    });
   };
 
   const success = () => {
