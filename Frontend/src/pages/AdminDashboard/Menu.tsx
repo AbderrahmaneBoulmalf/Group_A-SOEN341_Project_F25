@@ -8,8 +8,8 @@ const Menu: React.FC = () => {
 
   const textMap: Record<string, TextMap> = {
     "/admin": {
-      title: "Admin Overview",
-      text: "Quick snapshot of approvals, moderation and platform activity.",
+      title: "Approvals",
+      text: "Review and approve organizer accounts and event submissions.",
     },
     "/admin/approvals": {
       title: "Approvals",
@@ -48,6 +48,3 @@ const Menu: React.FC = () => {
 };
 
 export default Menu;
-
-
-
