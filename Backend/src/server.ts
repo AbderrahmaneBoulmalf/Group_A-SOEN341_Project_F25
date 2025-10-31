@@ -57,8 +57,8 @@ app.use((req, _, next) => {
 app.post("/register", auth.register);
 app.post("/login", auth.login);
 app.post("/logout", auth.logout);
-app.get("/verify-session", authMiddleware.requireAuth, (_req, res) =>
-  res.status(200).json({ success: true })
+app.get("/verify-session", authMiddleware.requireAuth, (req, res) =>
+  res.status(200).json({ success: true, role: req.session.role })
 );
 app.get("/user", authMiddleware.requireAuth, userService.getUsername);
 app.get("/profile", authMiddleware.requireAuth, userService.getProfile);
@@ -286,6 +286,13 @@ app.post(
       });
     }
   }
+);
+
+app.get(
+  "/student/calendar",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("student"),
+  studentEventsController.getCalendarEvents
 );
 
 app.get(

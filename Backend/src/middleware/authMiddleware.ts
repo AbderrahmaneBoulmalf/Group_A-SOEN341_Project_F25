@@ -9,7 +9,7 @@ declare module "express-session" {
 }
 
 const requireAuth = (req: Request, res: Response, next: NextFunction) => {
-  if (req.session.userId) {
+  if (req.session.userId && req.session.role) {
     next(); // User is authenticated
   } else {
     res
