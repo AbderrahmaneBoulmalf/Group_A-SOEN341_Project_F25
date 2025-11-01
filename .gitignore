@@ -131,3 +131,13 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*aiv.env
+
+# local artifacts
+admin.cookies
+mgr.txt
+admin.txt
+
+# prevent accidental root Node files
+/package.json
+/package-lock.json
+
