@@ -12,6 +12,7 @@ import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import passRoute from "./routes/passAuth.js";
 import { issuePass } from "./middleware/issuePass.js";
+import exportEventAttendeesCsv from "./events/exportAttendees.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envPath = path.resolve(__dirname, "../../.env");
@@ -57,8 +58,8 @@ app.use((req, _, next) => {
 app.post("/register", auth.register);
 app.post("/login", auth.login);
 app.post("/logout", auth.logout);
-app.get("/verify-session", authMiddleware.requireAuth, (_req, res) =>
-  res.status(200).json({ success: true })
+app.get("/verify-session", authMiddleware.requireAuth, (req, res) =>
+  res.status(200).json({ success: true, role: req.session.role })
 );
 app.get("/user", authMiddleware.requireAuth, userService.getUsername);
 app.get("/profile", authMiddleware.requireAuth, userService.getProfile);
@@ -289,6 +290,13 @@ app.post(
 );
 
 app.get(
+  "/student/calendar",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("student"),
+  studentEventsController.getCalendarEvents
+);
+
+app.get(
   "/student/saved-events",
   authMiddleware.requireAuth,
   authMiddleware.requireRole("student"),
@@ -316,6 +324,12 @@ app.post(
 );
 app.use("/internal", passRoute);
 
+app.get(
+  "/manager/events/:eventId/attendees/export",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("student"),
+  exportEventAttendeesCsv
+);
 app.post(
   "/api/events",
   authMiddleware.requireAuth,
