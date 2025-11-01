@@ -95,4 +95,24 @@ const settings: React.ReactNode = (
     />
   </svg>
 );
-export { home, avatar, logout, settings, MyEvents, createEvents };
+const qrReader: React.ReactNode = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className="h-6 w-6"
+  >
+    <rect x="3" y="3" width="7.5" height="7.5" rx="1" />
+    <rect x="13.5" y="3" width="7.5" height="7.5" rx="1" />
+    <rect x="3" y="13.5" width="7.5" height="7.5" rx="1" />
+
+    <rect x="5.25" y="5.25" width="3" height="3" rx=".5" />
+    <rect x="15.75" y="5.25" width="3" height="3" rx=".5" />
+    <rect x="5.25" y="15.75" width="3" height="3" rx=".5" />
+
+    <path d="M13.5 13.5h3v3M18 13.5v-1.5M16.5 18H21M18 21v-3M15 21h1.5V18M21 18h-1.5" />
+  </svg>
+);
+export { home, avatar, logout, settings, MyEvents, createEvents, qrReader };
