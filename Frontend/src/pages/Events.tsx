@@ -40,13 +40,13 @@ const Events: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        //assuming that the variable isOnline is the attendance
+        //assuming that the variable capacity is the attendance
         const qs = buildQuery({
           search,
           category,
           dateFrom,
           dateTo,
-          sort: sortByPopularity ? "isOnline" : "",
+          sort: sortByPopularity ? "capacity" : "",
         });
         const url = "http://localhost:8787/api/events" + (qs ? `?${qs}` : "");
 
