@@ -53,12 +53,13 @@ const App: React.FC = () => {
             <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Route>
-        {/* Add Protected Routes for Manager after */}
-        <Route path="manager" element={<ManagerLayout />}>
-          <Route index element={<MyEvents />} />
-          <Route path="my-events" element={<MyEvents />} />
-          <Route path="create-events" element={<CreateEvents />} />
-          <Route path="settings" element={<ManagerSettings />} />
+        <Route element={<ProtectedRoutes role="manager" />}>
+          <Route path="manager" element={<ManagerLayout />}>
+            <Route index element={<MyEvents />} />
+            <Route path="my-events" element={<MyEvents />} />
+            <Route path="create-events" element={<CreateEvents />} />
+            <Route path="settings" element={<ManagerSettings />} />
+          </Route>
         </Route>
         <Route element={<ProtectedRoutes role="student" />}>
           <Route path="student" element={<Layout />}>

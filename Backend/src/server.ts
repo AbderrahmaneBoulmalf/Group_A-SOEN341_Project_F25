@@ -60,16 +60,13 @@ app.get("/verify-session", authMiddleware.requireAuth, (req, res) =>
   res.status(200).json({ success: true, role: req.session.role })
 );
 
-
-
 app.get("/user", authMiddleware.requireAuth, userService.getUsername);
 app.get("/profile", authMiddleware.requireAuth, userService.getProfile);
 
 app.get("/session/me", authMiddleware.requireAuth, (req, res) => {
   const s: any = (req as any).session || {};
   const role = typeof s.role === "string" ? String(s.role).toLowerCase() : null;
-  const statusNum =
-    Number.isFinite(Number(s.status)) ? Number(s.status) : null;
+  const statusNum = Number.isFinite(Number(s.status)) ? Number(s.status) : null;
   res.status(200).json({
     success: true,
     user: {
@@ -338,6 +335,7 @@ app.post(
   authMiddleware.requireAuth,
   authMiddleware.requireRole("admin"),
   accountManagementController.deactivateManagerAccount
+);
 // Admin analytics (requires admin role)
 app.get(
   "/api/admin/analytics",
