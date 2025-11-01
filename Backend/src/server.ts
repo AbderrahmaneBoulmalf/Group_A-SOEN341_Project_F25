@@ -320,7 +320,7 @@ app.use("/student", passRoute);
 app.get(
   "/manager/events/:eventId/attendees/export",
   authMiddleware.requireAuth,
-  authMiddleware.requireRole("student"),
+  authMiddleware.requireRole("manager"),
   exportEventAttendeesCsv
 );
 app.get(
