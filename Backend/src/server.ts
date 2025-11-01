@@ -9,12 +9,14 @@ import db from "./db.js";
 import authMiddleware from "./middleware/authMiddleware.js";
 import auth from "./accounts/auth.js";
 import events from "./events/events.js";
+import analytics from "./analytics/analytics.js";
 import userService from "./accounts/userService.js";
 import studentEventsController from "./accounts/students/events.js";
 import passRoute from "./routes/passAuth.js";
 import exportEventAttendeesCsv from "./events/exportAttendees.js";
 import adminOrganizers from "./accounts/adminOrganizers.js";
 import ensureActiveManager from "./middleware/ensureActiveManager.js";
+import accountManagementController from "./accounts/admins/manageAccounts.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
@@ -315,6 +317,36 @@ app.get(
   exportEventAttendeesCsv
 );
 
+// Admin Routes
+
+app.get(
+  "/admin/manager-accounts",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("admin"),
+  accountManagementController.getManagerAccounts
+);
+
+app.post(
+  "/admin/reactivate-manager",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("admin"),
+  accountManagementController.reactivateManagerAccount
+);
+
+app.post(
+  "/admin/disable-manager",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("admin"),
+  accountManagementController.deactivateManagerAccount
+// Admin analytics (requires admin role)
+app.get(
+  "/api/admin/analytics",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("admin"),
+  analytics.getAnalytics
+);
+
+// Start Server
 app.listen(8787, () => {
   console.log("Server running on http://localhost:8787");
 });
