@@ -1,21 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { BrowserQRCodeReader } from "@zxing/browser";
 import Navbar from "@/components/navbar";
+import axios from "axios";
 
-// - Upload a QR image file (screenshot/photo).
-// - Decode the QR from the image (client-side).
-// - Verify the decoded passId with backend.
-
-//To be used with backend verification in the future
-type VerifyResponse = {
-  ok: boolean;
-  userId?: string;
-  eventId?: string;
-  error?: string;
-};
+// (Optional) You aren't using this right now, so you can remove it.
+// type VerifyResponse = { ok: boolean; userId?: string; eventId?: string; error?: string; passId?: string; };
 
 export default function QRFromImagePreviewPage() {
-  const fileRef = useRef<HTMLInputElement | null>(null); // file input ref
+  const fileRef = useRef<HTMLInputElement | null>(null);
 
   // Preview + decode state
   const [previewUrl, setPreviewUrl] = useState<string>("");
@@ -26,14 +18,14 @@ export default function QRFromImagePreviewPage() {
   const [verifying, setVerifying] = useState(false);
   const [verifyMsg, setVerifyMsg] = useState<string>("");
 
-  // Revoke previous object URL when it changes or on unmount
+  // Revoke previous object URL on change/unmount
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
 
-  //Function called when user picks a file
+  // When user picks a file
   async function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
     setDecodeError("");
     setVerifyMsg("");
@@ -42,71 +34,57 @@ export default function QRFromImagePreviewPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    //Create a URL for the uploaded image
     const url = URL.createObjectURL(file);
     setPreviewUrl((prev) => {
       if (prev) URL.revokeObjectURL(prev);
       return url;
     });
 
-    //Decode the QR from that image URL (silently—no text shown on the page)
     try {
       const reader = new BrowserQRCodeReader();
-      const res = await reader.decodeFromImageUrl(url); // throws if not found/decodable
-      setDecoded(res.getText()); //sets the decoded text
+      const res = await reader.decodeFromImageUrl(url); // throws if not decodable
+      setDecoded(res.getText());
     } catch (err: any) {
       setDecodeError(err?.message ?? "Could not decode QR from image.");
     }
   }
 
-  //Function to verify the passId with backend
+  // Verify the decoded pass with backend
   async function verifyPass() {
-    if (!decoded) return; //if nothing decoded, do nothing
+    if (!decoded) return;
     setVerifying(true);
     setVerifyMsg("");
 
     try {
-      //Backend verification - to be done in future
-      /*
-      async function verify(passId: string): Promise<VerifyResponse> {
-        const res = await fetch("/verifyQRCode", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ passId }),
-        });
-        return res.json() as Promise<VerifyResponse>;
-      }*/
-
-      // Simulate network delay and response, can delete after backend is ready
-      await new Promise((r) => setTimeout(r, 350));
-      const data: VerifyResponse = await new Promise((resolve) =>
-        setTimeout(
-          () =>
-            resolve({ ok: true, userId: "u_demo_123", eventId: "e_demo_456" }),
-          350
-        )
+      // If your QR contains JSON like {"passId": "..."} extract it; else use the raw decoded string
+      const passFromQR = decoded;
+      const resp = await axios.post(
+        "http://localhost:8787/internal/verify",
+        { pass: passFromQR },
+        { validateStatus: () => true }
       );
 
-      // Show result
-      if (data.ok) {
-        setVerifyMsg("✅ Pass verified. Access granted.");
+      if (resp.status === 200 && resp.data?.valid) {
+        setVerifyMsg(`✅ Pass verified. Access granted.`);
+      } else if (resp.status === 200 && !resp.data?.valid) {
+        setVerifyMsg("❌ Invalid or already used pass.");
+      } else if (resp.status === 404 || resp.status === 410) {
+        setVerifyMsg("❌ No valid pass found for this code.");
       } else {
-        setVerifyMsg(
-          `❌ Verification failed: ${data.error ?? "unknown error"}`
-        );
+        setVerifyMsg(`❌ Verification failed (status ${resp.status}).`);
       }
-    } catch {
-      setVerifyMsg("❌ Verification error.");
+    } catch (err: any) {
+      setVerifyMsg(`❌ Verification error: ${err?.message ?? "unknown"}`);
     } finally {
       setVerifying(false);
     }
   }
 
+  // ---------- Component JSX ----------
   return (
     <div className="min-h-screen flex flex-col bg-[#f6f9ff]">
       <Navbar />
 
-      {/* Top */}
       <main className="flex-1 flex items-center justify-center py-16 px-6">
         <section className="w-full max-w-2xl">
           <div className="text-center mb-8">
