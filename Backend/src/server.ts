@@ -308,6 +308,13 @@ app.post(
 app.get("/api/events", events.getEvents);
 
 app.get(
+  "/student/calendar",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("student"),
+  studentEventsController.getCalendarEvents
+);
+
+app.get(
   "/api/events/:eventId/attendees/export",
   authMiddleware.requireAuth,
   authMiddleware.requireRole("manager"),
