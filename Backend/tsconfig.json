@@ -14,7 +14,7 @@
     // "types": [],
     // For nodejs:
     "lib": ["esnext"],
-    "types": ["node", "jest"],
+  "types": ["node","jest"],
     // "typeRoots": ["./node_modules/@types"],
 
     // Other Outputs
@@ -47,5 +47,5 @@
     "esm": true
   },
   "include": ["./src/**/*"],
-  "exclude": ["eslint.config.mts", "node_modules"]
+  "exclude": ["eslint.config.mts", "node_modules", "src/tests"]
 }
