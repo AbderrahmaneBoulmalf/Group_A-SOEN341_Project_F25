@@ -1,0 +1,11 @@
+
+Sami Erafii
+
+Contributions:
+- Configured CI pipeline for automated testing with github actions and jest for the backend (1h)
+- Designed and implemented the calendar component and page in the student dashboard (2h)
+- Added appropriate dashboard navigation buttons in the navbar (10min)
+- Successfully restricted user access depending on role (15min)
+- Designed and implemented the manager account moderation page in the admin dashboard (1.5-2h)
+- Implemented integration testing for all additional backend functions (1h)
+- Misc (1h)
