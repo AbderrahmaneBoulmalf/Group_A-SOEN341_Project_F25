@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { avatar, home, settings, logout, MyEvents, createEvents } from "./SidebarIcons";
+import {
+  avatar,
+  home,
+  settings,
+  logout,
+  MyEvents,
+  createEvents,
+  qrReader,
+} from "./SidebarIcons";
 import { Modal, ConfigProvider, Popover } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import Logo from "@/assets/logo.png";
@@ -97,7 +105,18 @@ const Sidebar: React.FC = () => {
               <p>&nbsp;Create Event</p>
             </li>
           </Link>
-
+          <Link to="/qrreader">
+            <li
+              className={`mb-1 flex cursor-pointer items-center space-x-3 rounded-lg p-2 ${
+                location.pathname.toLowerCase() === "/qrreader"
+                  ? "bg-blue-600 text-white"
+                  : "hover:bg-[#E5E5E5]"
+              }`}
+            >
+              {qrReader}
+              <p>&nbsp;QR Reader</p>
+            </li>
+          </Link>
           <li className="mb-2 text-sm text-gray-800">Account</li>
           <Link to="/manager/settings">
             <li
@@ -141,7 +160,9 @@ const Sidebar: React.FC = () => {
               okText="Log out"
               cancelText="Cancel"
               okButtonProps={{ style: { backgroundColor: "#ef4444" } }}
-              cancelButtonProps={{ style: { border: "none", color: "#000000" } }}
+              cancelButtonProps={{
+                style: { border: "none", color: "#000000" },
+              }}
             />
           </ConfigProvider>
           <li

@@ -13,6 +13,7 @@ import analytics from "./analytics/analytics.js";
 import userService from "./accounts/userService.js";
 import studentEventsController from "./accounts/students/events.js";
 import passRoute from "./routes/passAuth.js";
+import { issuePass } from "./middleware/issuePass.js";
 import exportEventAttendeesCsv from "./events/exportAttendees.js";
 import adminOrganizers from "./accounts/adminOrganizers.js";
 import ensureActiveManager from "./middleware/ensureActiveManager.js";
@@ -290,8 +291,16 @@ app.post(
   studentEventsController.saveEvent
 );
 
-app.use("/student", passRoute);
+// Pass Routes
+app.post(
+  "/student/issue-pass",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("student"),
+  issuePass
+);
+app.use("/internal", passRoute);
 
+// Organizers
 app.use(
   "/admin/organizers",
   authMiddleware.requireAuth,
