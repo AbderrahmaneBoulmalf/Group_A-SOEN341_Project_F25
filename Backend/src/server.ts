@@ -13,6 +13,7 @@ import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import passRoute from "./routes/passAuth.js";
 import exportEventAttendeesCsv from "./events/exportAttendees.js";
+import accountManagementController from "./accounts/admins/manageAccounts.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envPath = path.resolve(__dirname, "../../.env");
@@ -332,6 +333,27 @@ app.post(
 );
 app.get("/api/events", events.getEvents);
 
+// Admin Routes
+
+app.get(
+  "/admin/manager-accounts",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("admin"),
+  accountManagementController.getManagerAccounts
+);
+
+app.post(
+  "/admin/reactivate-manager",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("admin"),
+  accountManagementController.reactivateManagerAccount
+);
+
+app.post(
+  "/admin/disable-manager",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("admin"),
+  accountManagementController.deactivateManagerAccount
 // Admin analytics (requires admin role)
 app.get(
   "/api/admin/analytics",
