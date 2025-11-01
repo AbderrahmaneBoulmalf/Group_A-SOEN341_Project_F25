@@ -40,8 +40,6 @@ const CalendarPage: React.FC = () => {
 
   const getListData = (value: Dayjs) => {
     const currentDate = value.format("YYYY-MM-DD");
-    console.log("Current Date:", currentDate);
-    console.log("Events:", events);
     const listData = events
       .filter((event) => event.date.slice(0, 10) === currentDate)
       .map((event) => {

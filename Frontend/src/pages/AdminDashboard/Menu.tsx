@@ -8,8 +8,8 @@ const Menu: React.FC = () => {
 
   const textMap: Record<string, TextMap> = {
     "/admin": {
-      title: "Admin Overview",
-      text: "Quick snapshot of approvals, moderation and platform activity.",
+      title: "Approvals",
+      text: "Review and approve organizer accounts and event submissions.",
     },
     "/admin/approvals": {
       title: "Approvals",
@@ -21,11 +21,11 @@ const Menu: React.FC = () => {
     },
     "/admin/analytics": {
       title: "Analytics",
-      text: "Track platform KPIs, growth and engagement.",
+      text: "View platform metrics, growth and engagement.",
     },
     "/admin/orgs-roles": {
       title: "Organizations & Roles",
-      text: "Manage organizations and assign roles.",
+      text: "Moderate organizational accounts and manage user roles.",
     },
     "/admin/settings": {
       title: "Settings",
@@ -48,6 +48,3 @@ const Menu: React.FC = () => {
 };
 
 export default Menu;
-
-
-
