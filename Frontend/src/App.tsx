@@ -35,7 +35,7 @@ import ApprovalsPage from "./pages/AdminDashboard/ApprovalsPage";
 import ModerationPage from "./pages/AdminDashboard/ModerationPage";
 import AnalyticsPage from "./pages/AdminDashboard/AnalyticsPage";
 import OrgsRolesPage from "./pages/AdminDashboard/OrgsRolesPage";
-import AdminSettings from "./pages/AdminDashboard/SettingsPage";
+import AdminSettings from "./components/Dashboards/Admin/Elements/Settings";
 
 const App: React.FC = () => {
   return (
