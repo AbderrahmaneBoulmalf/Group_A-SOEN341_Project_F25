@@ -17,4 +17,6 @@ Contributions:
 -Implemented database for holding Ticket/Passes information (15min)
 -Implemented backend verification with the database for issuing new Tickets (3.5-4h)
 -Set up automated tests for backend pass components (1h)
--Fixed bug on logging out as admin account (5min)
+-Added settings page to manager and admin accounts (20min)
+-Meeting Minutes description (5min)
+-Mixed Bugfixing (15min)
