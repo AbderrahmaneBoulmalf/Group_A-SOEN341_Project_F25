@@ -115,7 +115,7 @@ const Sidebar: React.FC = () => {
 
         <button
           onClick={handleLogout}
-          className="mt-2 mb-3 flex items-center gap-3 rounded-lg p-2 text-sm text-red-600 hover:bg-red-50 transition"
+          className="mt-2 mb-3 flex items-center gap-3 rounded-lg p-2 text-sm text-red-600 hover:bg-red-50 transition hover:cursor-pointer"
         >
           <span className="shrink-0">{logout}</span>
           <span>Log out</span>
