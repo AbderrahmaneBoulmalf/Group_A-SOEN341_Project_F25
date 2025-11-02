@@ -316,11 +316,20 @@ app.post(
 );
 app.get("/api/events", events.getEvents);
 
+// Student Routes
 app.get(
   "/student/calendar",
   authMiddleware.requireAuth,
   authMiddleware.requireRole("student"),
   studentEventsController.getCalendarEvents
+);
+
+// Manager Routes
+app.get(
+  "/manager/event/:id/analytics",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("manager"),
+  events.getEventAnalytics
 );
 
 app.get(
@@ -331,13 +340,13 @@ app.get(
 );
 
 // Admin Routes
-
 app.get(
   "/admin/manager-accounts",
   authMiddleware.requireAuth,
   authMiddleware.requireRole("admin"),
   accountManagementController.getManagerAccounts
 );
+
 
 app.post(
   "/admin/reactivate-manager",

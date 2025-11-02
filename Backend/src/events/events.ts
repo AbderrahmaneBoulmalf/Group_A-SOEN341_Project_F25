@@ -71,112 +71,114 @@ interface EventResponse {
   meetingLink?: string;
 }
 
-const getEvents = (req: Request, res: Response) => {
-  const { search, category, dateFrom, dateTo } =
-    (req.query as Record<string, string>) || {};
+const getEvents = async (req: Request, res: Response) => {
+  try {
+    const { search, category, dateFrom, dateTo } =
+      (req.query as Record<string, string>) || [];
 
-  // First, check what columns exist in the events table
-  let sql = `
-    SELECT
-      id,
-      title,
-      date,
-      organization,
-      description,
-      location,
-      category,
-      capacity,
-      price,
-      imageUrl,
-      longDescription,
-      requirements,
-      contactEmail,
-      contactPhone,
-      tags,
-      startTime,
-      endTime,
-      registrationDeadline,
-      isOnline,
-      meetingLink
-    FROM events
-    WHERE 1=1
-  `;
-  const params: string[] = [];
+    let sql = `
+      SELECT
+        id,
+        title,
+        date,
+        organization,
+        description,
+        location,
+        category,
+        capacity,
+        price,
+        imageUrl,
+        longDescription,
+        requirements,
+        contactEmail,
+        contactPhone,
+        tags,
+        startTime,
+        endTime,
+        registrationDeadline,
+        isOnline,
+        meetingLink
+      FROM events
+      WHERE 1=1
+    `;
+    const params: any[] = [];
 
-  // free-text search in title OR description
-  if (search && search.trim() !== "") {
-    sql += ` AND (title LIKE ? OR description LIKE ?)`;
-    const like = `%${search.trim()}%`;
-    params.push(like, like);
-  }
-
-  // category filter (exact)
-  if (category && category.trim() !== "") {
-    sql += ` AND category = ?`;
-    params.push(category.trim());
-  }
-
-  // date range filters (inclusive)
-  if (dateFrom && dateFrom.trim() !== "") {
-    sql += ` AND DATE(date) >= ?`;
-    params.push(dateFrom.trim());
-  }
-  if (dateTo && dateTo.trim() !== "") {
-    sql += ` AND DATE(date) <= ?`;
-    params.push(dateTo.trim());
-  }
-
-  // stable ordering
-  sql += ` ORDER BY date ASC`;
-
-  db.query<EventRow[]>(sql, params, (err, results) => {
-    if (err) {
-      console.error("GET /api/events error:", err);
-      return res.status(500).json({ error: "Failed to fetch events" });
+    // --- Filter by manager's contactEmail ---
+    if (req.session.role === "manager") {
+      sql += ` AND contactEmail = (SELECT Email FROM Users WHERE ID = ?)`;
+      params.push(req.session.userId);
     }
 
-    // Process results to add default values for enhanced fields
-    const processedResults: EventResponse[] = results.map((event) => {
-      let tags: string[] = [];
-      if (event.tags) {
-        try {
-          const parsed = JSON.parse(event.tags);
-          if (Array.isArray(parsed)) {
-            tags = parsed.map((tag) => String(tag).trim()).filter(Boolean);
-          }
-        } catch (parseError) {
-          console.warn("Failed to parse event tags:", parseError);
+    // free-text search
+    if (search && search.trim() !== "") {
+      sql += ` AND (title LIKE ? OR description LIKE ?)`;
+      const like = `%${search.trim()}%`;
+      params.push(like, like);
+    }
+
+    // category filter
+    if (category && category.trim() !== "") {
+      sql += ` AND category = ?`;
+      params.push(category.trim());
+    }
+
+    // date range filters
+    if (dateFrom && dateFrom.trim() !== "") {
+      sql += ` AND DATE(date) >= ?`;
+      params.push(dateFrom.trim());
+    }
+    if (dateTo && dateTo.trim() !== "") {
+      sql += ` AND DATE(date) <= ?`;
+      params.push(dateTo.trim());
+    }
+
+    sql += ` ORDER BY date ASC`;
+
+    const [results] = await db.promise().query(sql, params);
+
+    // process tags
+    const processedResults: EventResponse[] = (results as EventRow[]).map(
+      (event) => {
+        let tags: string[] = [];
+        if (event.tags) {
+          try {
+            const parsed = JSON.parse(event.tags);
+            if (Array.isArray(parsed)) {
+              tags = parsed.map((tag) => String(tag).trim()).filter(Boolean);
+            }
+          } catch {}
         }
+
+        return {
+          id: event.id,
+          title: event.title,
+          date: event.date,
+          organization: event.organization,
+          description: event.description,
+          location: event.location,
+          category: event.category,
+          capacity: event.capacity ?? undefined,
+          price: event.price ?? undefined,
+          imageUrl: event.imageUrl ?? undefined,
+          longDescription: event.longDescription ?? undefined,
+          requirements: event.requirements ?? undefined,
+          contactEmail: event.contactEmail ?? undefined,
+          contactPhone: event.contactPhone ?? undefined,
+          tags,
+          startTime: event.startTime ?? undefined,
+          endTime: event.endTime ?? undefined,
+          registrationDeadline: event.registrationDeadline ?? undefined,
+          isOnline: Boolean(event.isOnline),
+          meetingLink: event.meetingLink ?? undefined,
+        };
       }
-
-      const processed: EventResponse = {
-        id: event.id,
-        title: event.title,
-        date: event.date,
-        organization: event.organization,
-        description: event.description,
-        location: event.location,
-        category: event.category,
-        capacity: event.capacity ?? undefined,
-        price: event.price ?? undefined,
-        imageUrl: event.imageUrl ?? undefined,
-        longDescription: event.longDescription ?? undefined,
-        requirements: event.requirements ?? undefined,
-        contactEmail: event.contactEmail ?? undefined,
-        contactPhone: event.contactPhone ?? undefined,
-        tags,
-        startTime: event.startTime ?? undefined,
-        endTime: event.endTime ?? undefined,
-        registrationDeadline: event.registrationDeadline ?? undefined,
-        isOnline: Boolean(event.isOnline),
-        meetingLink: event.meetingLink ?? undefined,
-      };
-
-      return processed;
-    });
+    );
 
     res.json(processedResults);
-  });
+  } catch (err) {
+    console.error("GET /api/events error:", err);
+    res.status(500).json({ error: "Failed to fetch events" });
+  }
 };
 
 const REQUIRED_FIELDS: (keyof CreateEventBody)[] = [
@@ -335,6 +337,48 @@ const createEvent = async (
       .json({ success: false, message: "Failed to create event" });
   }
 };
+const getEventAnalytics = async (req: Request, res: Response) => {
+  const eventId = parseInt(req.params.id, 10);
 
-const events = { getEvents, createEvent };
+  if (isNaN(eventId)) {
+    return res.status(400).json({ error: "Invalid event ID" });
+  }
+
+  try {
+    // Tickets sold
+    const [ticketsResult] = await db.promise().query(
+      `SELECT COUNT(*) AS ticketsSold
+         FROM ClaimedTickets
+         WHERE event_id = ?`,
+      [eventId]
+    );
+    const ticketsSold = (ticketsResult as any)[0]?.ticketsSold || 0;
+
+    // Event info
+    const [eventResult] = await db
+      .promise()
+      .query(`SELECT price, capacity FROM events WHERE id = ?`, [eventId]);
+    const eventRow = (eventResult as any)[0];
+    const price = eventRow?.price || 0;
+    const capacity = eventRow?.capacity || 0;
+
+    // Attendance (if no checked_in column, assume all tickets are attended)
+    const attendance = ticketsSold;
+
+    // Revenue
+    const revenue = ticketsSold * price;
+
+    res.json({
+      ticketsSold,
+      attendance,
+      revenue,
+      capacity,
+    });
+  } catch (err) {
+    console.error("GET /manager/event/:id/analytics error:", err);
+    res.status(500).json({ error: "Failed to fetch analytics" });
+  }
+};
+
+const events = { getEvents, createEvent, getEventAnalytics };
 export default events;
