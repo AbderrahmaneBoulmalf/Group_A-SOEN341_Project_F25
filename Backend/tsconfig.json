@@ -18,5 +18,5 @@
     "esm": true
   },
   "include": ["./src/**/*"],
-  "exclude": ["eslint.config.mts", "node_modules", "src/tests"]
+  "exclude": ["eslint.config.mts", "node_modules"]
 }
