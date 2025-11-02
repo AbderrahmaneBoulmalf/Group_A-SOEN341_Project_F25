@@ -20,3 +20,11 @@ Contributions:
 -Added settings page to manager and admin accounts (20min)
 -Meeting Minutes description (5min)
 -Mixed Bugfixing (15min)
+
+Abderrahmane Boulmalf
+
+Contributions:
+-Updated the frontend events listing search fitler and added a button (30min)
+-Implemented backend modifications to allow the sorting of events (1h)
+-Updated the getevents function in events/events (30min)
+-Debugging (2h)
