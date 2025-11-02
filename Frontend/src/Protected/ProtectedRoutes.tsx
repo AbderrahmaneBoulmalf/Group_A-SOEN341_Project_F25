@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import axios from "axios";
 
-const ProtectedRoutes: React.FC = () => {
+interface Props {
+  role: string;
+}
+
+const ProtectedRoutes: React.FC<Props> = ({ role }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -12,7 +16,10 @@ const ProtectedRoutes: React.FC = () => {
           "http://localhost:8787/verify-session",
           { withCredentials: true }
         );
-        if (response.data.success) {
+        if (
+          response.data.success &&
+          response.data.role.toLowerCase() === role.toLowerCase()
+        ) {
           setIsAuthenticated(true);
         } else {
           setIsAuthenticated(false);
@@ -22,7 +29,7 @@ const ProtectedRoutes: React.FC = () => {
       }
     };
     verifySession();
-  }, []);
+  }, [role]);
 
   if (isAuthenticated === null) {
     return <div>Loading...</div>;

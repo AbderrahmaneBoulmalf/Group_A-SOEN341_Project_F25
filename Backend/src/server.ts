@@ -1,36 +1,36 @@
 import express from "express";
 import cors from "cors";
-import db from "./db.js";
 import session from "express-session";
-import authMiddleware from "./middleware/authMiddleware.js";
-import auth from "./accounts/auth.js";
-import events from "./events/events.js";
-import userService from "./accounts/userService.js";
-import studentEventsController from "./accounts/students/events.js";
 import path from "path";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
+
+import db from "./db.js";
+import authMiddleware from "./middleware/authMiddleware.js";
+import auth from "./accounts/auth.js";
+import events from "./events/events.js";
+import analytics from "./analytics/analytics.js";
+import userService from "./accounts/userService.js";
+import studentEventsController from "./accounts/students/events.js";
 import passRoute from "./routes/passAuth.js";
+import { issuePass } from "./middleware/issuePass.js";
+import exportEventAttendeesCsv from "./events/exportAttendees.js";
+import adminOrganizers from "./accounts/adminOrganizers.js";
+import ensureActiveManager from "./middleware/ensureActiveManager.js";
+import accountManagementController from "./accounts/admins/manageAccounts.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const envPath = path.resolve(__dirname, "../../.env");
-dotenv.config({ path: envPath });
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const app = express();
 
-console.log("Database module imported:", db ? "success" : "failed");
-
-// Middleware
 app.use(express.json());
-
 app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
   })
 );
-
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
@@ -40,27 +40,46 @@ app.use(
     saveUninitialized: false,
     cookie: {
       secure: process.env.NODE_ENV === "production",
-      maxAge: 1000 * 60 * 60, // 1 hour
+      maxAge: 1000 * 60 * 60,
       httpOnly: true,
     },
   })
 );
 
-app.use((req, _, next) => {
-  if (req.session) req.session.touch(); // reset maxAge on every request
+app.use((req, _res, next) => {
+  (req as any).session?.touch?.();
   next();
 });
 
-// Account Routes
+console.log("Database module imported:", db ? "success" : "failed");
 
 app.post("/register", auth.register);
 app.post("/login", auth.login);
 app.post("/logout", auth.logout);
-app.get("/verify-session", authMiddleware.requireAuth, (_req, res) =>
-  res.status(200).json({ success: true })
+
+app.get("/verify-session", authMiddleware.requireAuth, (req, res) =>
+  res.status(200).json({ success: true, role: req.session.role })
 );
+
 app.get("/user", authMiddleware.requireAuth, userService.getUsername);
 app.get("/profile", authMiddleware.requireAuth, userService.getProfile);
+
+app.get("/session/me", authMiddleware.requireAuth, (req, res) => {
+  const s: any = (req as any).session || {};
+  const role = typeof s.role === "string" ? String(s.role).toLowerCase() : null;
+  const statusNum = Number.isFinite(Number(s.status)) ? Number(s.status) : null;
+  res.status(200).json({
+    success: true,
+    user: {
+      id: s.userId ?? null,
+      username: s.username ?? null,
+      email: s.email ?? null,
+      role,
+      status: statusNum,
+    },
+  });
+});
+
 app.post(
   "/profile/changePassword",
   authMiddleware.requireAuth,
@@ -77,22 +96,19 @@ app.post(
   userService.deleteAccount
 );
 
-// Student Routes
 app.get(
   "/student/tickets",
   authMiddleware.requireAuth,
   authMiddleware.requireRole("student"),
   async (req, res) => {
     try {
-      const studentId = req.session.userId;
-
+      const studentId = (req as any).session?.userId;
       if (!studentId) {
         return res
           .status(401)
           .json({ success: false, message: "No student ID in session" });
       }
 
-      // Fetch claimed tickets
       const [claimedRows] = await db
         .promise()
         .query("SELECT * FROM ClaimedTickets WHERE student_id = ?", [
@@ -104,30 +120,24 @@ app.get(
         return res.status(200).json({ success: true, tickets: [] });
       }
 
-      // Collect distinct event_ids
       const eventIds = Array.from(
-        new Set(claimed.map((r: any) => Number(r.event_id)).filter(Boolean))
+        new Set(
+          claimed
+            .map((r: any) => Number(r.event_id))
+            .filter((n) => Number.isFinite(n))
+        )
       );
 
       let eventsMap: Record<number, any> = {};
-
       if (eventIds.length > 0) {
-        const tryFetchEvents = async (tableName: string) => {
-          const placeholders = eventIds.map(() => "?").join(",");
-          const sql = `SELECT id, title, date, location FROM ${tableName} WHERE id IN (${placeholders})`;
-          const [rows] = await db.promise().query(sql, eventIds);
-          return (rows as any[]) || [];
-        };
-
-        try {
-          const rows = await tryFetchEvents("events");
-          rows.forEach((r: any) => (eventsMap[Number(r.id)] = r));
-        } catch (err2) {
-          console.warn(
-            "Could not fetch event details:",
-            (err2 as Error).message
+        const placeholders = eventIds.map(() => "?").join(",");
+        const [rows] = await db
+          .promise()
+          .query(
+            `SELECT id, title, date, location FROM events WHERE id IN (${placeholders})`,
+            eventIds
           );
-        }
+        (rows as any[]).forEach((r: any) => (eventsMap[Number(r.id)] = r));
       }
 
       const tickets = claimed.map((c: any) => {
@@ -136,15 +146,14 @@ app.get(
           id: c.id,
           student_id: c.student_id,
           event_id: c.event_id,
-          eventTitle: ev ? ev.title : null,
-          date: ev ? ev.date : null,
-          location: ev ? ev.location : null,
+          eventTitle: ev?.title ?? null,
+          date: ev?.date ?? null,
+          location: ev?.location ?? null,
         };
       });
 
       res.status(200).json({ success: true, tickets });
     } catch (error) {
-      console.error("Error fetching student tickets:", error);
       res.status(500).json({
         success: false,
         message: "Failed to fetch tickets",
@@ -160,7 +169,7 @@ app.post(
   authMiddleware.requireRole("student"),
   async (req, res) => {
     try {
-      const studentId = req.session.userId;
+      const studentId = (req as any).session?.userId;
       const { eventId } = req.body;
 
       if (!studentId) {
@@ -168,7 +177,6 @@ app.post(
           .status(401)
           .json({ success: false, message: "Not authenticated" });
       }
-
       if (!eventId || isNaN(Number(eventId))) {
         return res
           .status(400)
@@ -181,36 +189,23 @@ app.post(
           "SELECT * FROM ClaimedTickets WHERE student_id = ? AND event_id = ?",
           [studentId, eventId]
         );
-
       if ((existing as any[]).length > 0) {
         return res
           .status(409)
           .json({ success: false, message: "Ticket already claimed" });
       }
 
-      // Insert into ClaimedTickets table in the db
-      let result: any;
-      try {
-        const insertSql =
-          "INSERT INTO ClaimedTickets (student_id, event_id) VALUES (?, ?)";
-        const [insertResult] = await db
-          .promise()
-          .query(insertSql, [studentId, eventId]);
-        result = insertResult;
-      } catch (dbErr: any) {
-        if (dbErr && dbErr.code === "ER_DUP_ENTRY") {
-          return res
-            .status(409)
-            .json({ success: false, message: "Ticket already claimed" });
-        }
-        throw dbErr;
-      }
+      const [insertResult] = await db
+        .promise()
+        .query(
+          "INSERT INTO ClaimedTickets (student_id, event_id) VALUES (?, ?)",
+          [studentId, eventId]
+        );
 
-      // Send success response so frontend gets immediate confirmation
       return res.status(200).json({
         success: true,
         message: "Ticket claimed",
-        ticketId: result.insertId ?? null,
+        ticketId: (insertResult as any).insertId ?? null,
       });
     } catch (err) {
       res.status(500).json({
@@ -222,34 +217,27 @@ app.post(
   }
 );
 
-// Mock payment endpoint that creates a claimed ticket after "payment"
 app.post(
   "/student/pay-and-claim",
   authMiddleware.requireAuth,
   authMiddleware.requireRole("student"),
   async (req, res) => {
     try {
-      const studentId = req.session.userId;
+      const studentId = (req as any).session?.userId;
       const { eventId, payment } = req.body;
 
-      if (!studentId) {
+      if (!studentId)
         return res
           .status(401)
           .json({ success: false, message: "Not authenticated" });
-      }
-      if (!eventId || isNaN(Number(eventId))) {
+      if (!eventId || isNaN(Number(eventId)))
         return res
           .status(400)
           .json({ success: false, message: "Missing or invalid eventId" });
-      }
-
-      // (Optional) minimal mock payment validation
-      if (!payment || !payment.card || String(payment.card).length < 12) {
-        // For mock flow fail fast
+      if (!payment || !payment.card || String(payment.card).length < 12)
         return res
           .status(400)
           .json({ success: false, message: "Invalid payment info" });
-      }
 
       const [existing] = await db
         .promise()
@@ -257,19 +245,17 @@ app.post(
           "SELECT * FROM ClaimedTickets WHERE student_id = ? AND event_id = ?",
           [studentId, eventId]
         );
-
-      if ((existing as any[]).length > 0) {
+      if ((existing as any[]).length > 0)
         return res
           .status(409)
           .json({ success: false, message: "Ticket already claimed" });
-      }
 
-      // Insert into ClaimedTickets table
-      const insertSql =
-        "INSERT INTO ClaimedTickets (student_id, event_id) VALUES (?, ?)";
       const [insertResult] = await db
         .promise()
-        .query(insertSql, [studentId, eventId]);
+        .query(
+          "INSERT INTO ClaimedTickets (student_id, event_id) VALUES (?, ?)",
+          [studentId, eventId]
+        );
 
       return res.status(200).json({
         success: true,
@@ -277,7 +263,6 @@ app.post(
         ticketId: (insertResult as any).insertId ?? null,
       });
     } catch (err) {
-      console.error("pay-and-claim error:", err);
       return res.status(500).json({
         success: false,
         message: "Failed to process payment/claim",
@@ -307,15 +292,82 @@ app.post(
 );
 
 // Pass Routes
-app.use("/student", passRoute);
+app.post(
+  "/student/issue-pass",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("student"),
+  issuePass
+);
+app.use("/internal", passRoute);
+
+// Organizers
+app.use(
+  "/admin/organizers",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("admin"),
+  adminOrganizers
+);
 
 app.post(
   "/api/events",
   authMiddleware.requireAuth,
-
+  ensureActiveManager,
   events.createEvent
 );
 app.get("/api/events", events.getEvents);
+
+// Student Routes
+app.get(
+  "/student/calendar",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("student"),
+  studentEventsController.getCalendarEvents
+);
+
+// Manager Routes
+app.get(
+  "/manager/event/:id/analytics",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("manager"),
+  events.getEventAnalytics
+);
+
+app.get(
+  "/api/events/:eventId/attendees/export",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("manager"),
+  exportEventAttendeesCsv
+);
+
+// Admin Routes
+app.get(
+  "/admin/manager-accounts",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("admin"),
+  accountManagementController.getManagerAccounts
+);
+
+
+app.post(
+  "/admin/reactivate-manager",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("admin"),
+  accountManagementController.reactivateManagerAccount
+);
+
+app.post(
+  "/admin/disable-manager",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("admin"),
+  accountManagementController.deactivateManagerAccount
+);
+// Admin analytics (requires admin role)
+app.get(
+  "/api/admin/analytics",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("admin"),
+  analytics.getAnalytics
+);
 
 // Start Server
 app.listen(8787, () => {

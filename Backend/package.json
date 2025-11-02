@@ -8,7 +8,7 @@
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
     "lint": "eslint . --ext .ts",
-    "test": "jest --passWithNoTests"
+    "test": "jest --config ./jest.config.cjs"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +33,7 @@
     "typescript-eslint": "^8.45.0"
   },
   "dependencies": {
+    "axios": "^1.13.1",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

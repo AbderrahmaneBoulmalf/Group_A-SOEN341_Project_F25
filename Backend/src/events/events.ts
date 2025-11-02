@@ -153,7 +153,6 @@ const getEvents = (req: Request, res: Response) => {
         } catch (parseError) {
           console.warn("Failed to parse event tags:", parseError);
         }
-      }
 
       return {
         id: event.id,
@@ -180,7 +179,10 @@ const getEvents = (req: Request, res: Response) => {
     });
 
     res.json(processedResults);
-  });
+  } catch (err) {
+    console.error("GET /api/events error:", err);
+    res.status(500).json({ error: "Failed to fetch events" });
+  }
 };
 
 const REQUIRED_FIELDS: (keyof CreateEventBody)[] = [
@@ -339,6 +341,48 @@ const createEvent = async (
       .json({ success: false, message: "Failed to create event" });
   }
 };
+const getEventAnalytics = async (req: Request, res: Response) => {
+  const eventId = parseInt(req.params.id, 10);
 
-const events = { getEvents, createEvent };
+  if (isNaN(eventId)) {
+    return res.status(400).json({ error: "Invalid event ID" });
+  }
+
+  try {
+    // Tickets sold
+    const [ticketsResult] = await db.promise().query(
+      `SELECT COUNT(*) AS ticketsSold
+         FROM ClaimedTickets
+         WHERE event_id = ?`,
+      [eventId]
+    );
+    const ticketsSold = (ticketsResult as any)[0]?.ticketsSold || 0;
+
+    // Event info
+    const [eventResult] = await db
+      .promise()
+      .query(`SELECT price, capacity FROM events WHERE id = ?`, [eventId]);
+    const eventRow = (eventResult as any)[0];
+    const price = eventRow?.price || 0;
+    const capacity = eventRow?.capacity || 0;
+
+    // Attendance (if no checked_in column, assume all tickets are attended)
+    const attendance = ticketsSold;
+
+    // Revenue
+    const revenue = ticketsSold * price;
+
+    res.json({
+      ticketsSold,
+      attendance,
+      revenue,
+      capacity,
+    });
+  } catch (err) {
+    console.error("GET /manager/event/:id/analytics error:", err);
+    res.status(500).json({ error: "Failed to fetch analytics" });
+  }
+};
+
+const events = { getEvents, createEvent, getEventAnalytics };
 export default events;
