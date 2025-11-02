@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import db from "../db"; // adjust to your actual db import path
-import events from "../events/events";
+import db from "../db.js"; 
+import events from "../events/events.js";
 
 jest.mock("../db", () => ({
   promise: jest.fn(),
