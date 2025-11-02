@@ -72,10 +72,9 @@ interface EventResponse {
 }
 
 const getEvents = (req: Request, res: Response) => {
-  const { search, category, dateFrom, dateTo } =
+  const { search, category, dateFrom, dateTo, sort } =
     (req.query as Record<string, string>) || {};
 
-  // First, check what columns exist in the events table
   let sql = `
     SELECT
       id,
@@ -103,20 +102,16 @@ const getEvents = (req: Request, res: Response) => {
   `;
   const params: string[] = [];
 
-  // free-text search in title OR description
+  // filters
   if (search && search.trim() !== "") {
     sql += ` AND (title LIKE ? OR description LIKE ?)`;
     const like = `%${search.trim()}%`;
     params.push(like, like);
   }
-
-  // category filter (exact)
   if (category && category.trim() !== "") {
     sql += ` AND category = ?`;
     params.push(category.trim());
   }
-
-  // date range filters (inclusive)
   if (dateFrom && dateFrom.trim() !== "") {
     sql += ` AND DATE(date) >= ?`;
     params.push(dateFrom.trim());
@@ -126,16 +121,27 @@ const getEvents = (req: Request, res: Response) => {
     params.push(dateTo.trim());
   }
 
-  // stable ordering
-  sql += ` ORDER BY date ASC`;
+  // === SORTING (capacity vs date) ===
+  // IMPORTANT: only ONE ORDER BY; DO NOT append another later.
+  if (sort === "capacity") {
+    // Safest version: NULLs last, highest capacity first, then by date
+    sql += ` ORDER BY CASE WHEN capacity IS NULL THEN 1 ELSE 0 END ASC, capacity DESC, \`date\` ASC`;
+  } else {
+    sql += ` ORDER BY \`date\` ASC`;
+  }
 
   db.query<EventRow[]>(sql, params, (err, results) => {
     if (err) {
-      console.error("GET /api/events error:", err);
+      // Log helpful diagnostics during dev
+      console.error("GET /api/events SQL:", sql, params);
+      console.error(
+        "MySQL error:",
+        (err as any).sqlMessage || err.message,
+        (err as any).code
+      );
       return res.status(500).json({ error: "Failed to fetch events" });
     }
 
-    // Process results to add default values for enhanced fields
     const processedResults: EventResponse[] = results.map((event) => {
       let tags: string[] = [];
       if (event.tags) {
@@ -149,7 +155,7 @@ const getEvents = (req: Request, res: Response) => {
         }
       }
 
-      const processed: EventResponse = {
+      return {
         id: event.id,
         title: event.title,
         date: event.date,
@@ -171,8 +177,6 @@ const getEvents = (req: Request, res: Response) => {
         isOnline: Boolean(event.isOnline),
         meetingLink: event.meetingLink ?? undefined,
       };
-
-      return processed;
     });
 
     res.json(processedResults);
