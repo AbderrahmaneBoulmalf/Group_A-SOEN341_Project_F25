@@ -31,7 +31,6 @@ import EventAnalytics from "./components/Dashboards/Manager/Elements/EventAnalyt
 
 // Admin
 import AdminLayout from "./pages/AdminDashboard/Layout";
-import AdminHome from "./pages/AdminDashboard/Home";
 import ApprovalsPage from "./pages/AdminDashboard/ApprovalsPage";
 import ModerationPage from "./pages/AdminDashboard/ModerationPage";
 import AnalyticsPage from "./pages/AdminDashboard/AnalyticsPage";
