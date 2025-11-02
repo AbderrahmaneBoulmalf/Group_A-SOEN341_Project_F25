@@ -14,17 +14,26 @@ Contributions:
 Rafael W. Lenz
 
 Contributions:
--Implemented database for holding Ticket/Passes information (15min)
--Implemented backend verification with the database for issuing new Tickets (3.5-4h)
--Set up automated tests for backend pass components (1h)
--Added settings page to manager and admin accounts (20min)
--Meeting Minutes description (5min)
--Mixed Bugfixing (15min)
+- Implemented database for holding Ticket/Passes information (15min)
+- Implemented backend verification with the database for issuing new Tickets (3.5-4h)
+- Set up automated tests for backend pass components (1h)
+- Added settings page to manager and admin accounts (20min)
+- Meeting Minutes description (5min)
+- Mixed Bugfixing (15min)
 
 Abderrahmane Boulmalf
 
 Contributions:
--Updated the frontend events listing search fitler and added a button (30min)
--Implemented backend modifications to allow the sorting of events (1h)
--Updated the getevents function in events/events (30min)
--Debugging (2h)
+- Updated the frontend events listing search fitler and added a button (30min)
+- Implemented backend modifications to allow the sorting of events (1h)
+- Updated the getevents function in events/events (30min)
+- Debugging (2h)
+
+Sofian Boutamo
+
+Contributions:
+- Implemented mock payment page for claiming paid tickets, including payment form and validation (2h)
+- Added loading screen animation to simulate real payment processing flow (30min)
+- Added success/error notifications after ticket is successfully claimed/claiming a ticket that was already claimed (30min)
+- Performed debugging across the codebase, focusing on logic issues related to the ticket claiming flow (2–3h)
+- Wrote automated test to verify payment + claim logic (1h)
