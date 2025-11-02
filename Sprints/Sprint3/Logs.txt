@@ -8,4 +8,5 @@ Contributions:
 - Successfully restricted user access depending on role (15min)
 - Designed and implemented the manager account moderation page in the admin dashboard (1.5-2h)
 - Implemented integration testing for all additional backend functions (1h)
+- Designed architecture block diagram (30-40min)
 - Misc (1h)
