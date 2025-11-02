@@ -37,6 +37,7 @@ Contributions:
 - Added success/error notifications after ticket is successfully claimed/claiming a ticket that was already claimed (30min)
 - Performed debugging across the codebase, focusing on logic issues related to the ticket claiming flow (2–3h)
 - Wrote automated test to verify payment + claim logic (1h)
+- fixed import bugs (5mins)
 
 Ziad Agha
 
