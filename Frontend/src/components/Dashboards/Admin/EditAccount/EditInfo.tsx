@@ -104,7 +104,7 @@ const EditInfo: React.FC<Props> = ({ setError }) => {
                 htmlFor="username"
                 className="block text-slate-700 font-medium mb-1"
               >
-                Organization
+                Username
               </label>
               <input
                 id="username"
