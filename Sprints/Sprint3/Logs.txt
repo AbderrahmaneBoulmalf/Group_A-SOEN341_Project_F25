@@ -37,3 +37,13 @@ Contributions:
 - Added success/error notifications after ticket is successfully claimed/claiming a ticket that was already claimed (30min)
 - Performed debugging across the codebase, focusing on logic issues related to the ticket claiming flow (2–3h)
 - Wrote automated test to verify payment + claim logic (1h)
+
+Ziad Agha
+
+Contributions:
+- fixed event filtering when a manager views their own events after logging in (1h)
+- Added button functionality for the events in the manager dashboard (30 mins)
+- Implemented events analytics for manager events displaying revenue, attendance and tickets sold (2h)
+- Added attendance vs capacity pie chart for each event (30 mins)
+- Wrote automated test for the events-analytics function (1h)
+
