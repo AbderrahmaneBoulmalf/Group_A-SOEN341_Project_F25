@@ -10,3 +10,11 @@ Contributions:
 - Implemented integration testing for all additional backend functions (1h)
 - Designed architecture block diagram (30-40min)
 - Misc (1h)
+
+Rafael W. Lenz
+
+Contributions:
+-Implemented database for holding Ticket/Passes information (15min)
+-Implemented backend verification with the database for issuing new Tickets (3.5-4h)
+-Set up automated tests for backend pass components (1h)
+-Fixed bug on logging out as admin account (5min)
