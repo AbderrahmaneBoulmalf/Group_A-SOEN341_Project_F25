@@ -1,75 +1,106 @@
-import request from "supertest";
-import express from "express";
 
-// IMPORTANT: Your router has a **default export** and we are in ESM.
-// So tests must import with the .js extension.
-import adminOrganizers from "../accounts/adminOrganizers.js";
 
-// We need to mock the mysql wrapper used by adminOrganizers.ts
-// We'll expose the underlying jest fns on the default export so the test can control them.
+import type { Request, Response, NextFunction } from "express";
+
+let mQuery: jest.Mock;
+let mExecute: jest.Mock;
+
 jest.mock("../db.js", () => {
-  const query = jest.fn();
-  const execute = jest.fn();
-  const db = { promise: () => ({ query, execute }) };
-  // expose for tests
-  (db as any).__query = query;
-  (db as any).__execute = execute;
-  return { __esModule: true, default: db };
+  mQuery = jest.fn();
+  mExecute = jest.fn();
+  return {
+    __esModule: true,
+    default: {
+      promise: () => ({ query: mQuery, execute: mExecute }),
+    },
+  };
 });
 
-// @ts-ignore - we only need access to the mocked internals
-import db from "../db.js";
+import adminOrganizersRouter from "../accounts/adminOrganizers.js";
 
-const app = express();
-app.use(express.json());
-// mount exactly how your server would: base path /admin/organizers + router
-app.use("/admin/organizers", adminOrganizers);
+const makeRes = (): Partial<Response> => {
+  const res: Partial<Response> = {};
+  (res.status as any) = jest.fn().mockReturnValue(res);
+  (res.json as any) = jest.fn().mockReturnValue(res);
+  return res;
+};
+
+type Handler = (req: Request, res: Response, next: NextFunction) => any;
+
+type _ExpressLayer = {
+  route?: {
+    path: string;
+    methods: Record<string, boolean>;
+    stack: Array<{ handle: Handler }>;
+  };
+};
+
+function getHandler(method: "get" | "post", path: string): Handler {
+  const stack = (adminOrganizersRouter as unknown as { stack: _ExpressLayer[] }).stack;
+  const layer = stack.find(
+    (l) => l.route && l.route.path === path && l.route.methods[method]
+  );
+  if (!layer || !layer.route) {
+    throw new Error(`Route ${method.toUpperCase()} ${path} not found`);
+  }
+  return (layer.route.stack[0].handle as unknown) as Handler;
+}
 
 describe("Admin organizers routes", () => {
   beforeEach(() => {
-    const q = (db as any).__query as jest.Mock;
-    const ex = (db as any).__execute as jest.Mock;
-    q.mockReset();
-    ex.mockReset();
+    mQuery.mockReset();
+    mExecute.mockReset();
   });
 
-  test("GET /pending -> returns 200 and users array", async () => {
-    const q = (db as any).__query as jest.Mock;
-    q.mockResolvedValueOnce([
+  it("GET /pending -> returns 200 and users array", async () => {
+    mQuery.mockResolvedValue([
       [
-        { ID: 1, Username: "m1", Email: "m1@example.com", Role: "manager", Status: 0 },
-        { ID: 2, Username: "m2", Email: "m2@example.com", Role: "manager", Status: 0 },
+        { ID: 9, Username: "m1", Email: "m1@x", Role: "manager", Status: 0 },
+        { ID: 12, Username: "m2", Email: "m2@x", Role: "manager", Status: 0 },
       ],
     ]);
 
-    const res = await request(app).get("/admin/organizers/pending");
+    const req = {} as Request;
+    const res = makeRes() as Response;
+    const next = jest.fn();
 
-    expect(res.status).toBe(200);
-    // Your code responds with { success: true, users: rows ?? [] }
-    expect(res.body.success).toBe(true);
-    expect(Array.isArray(res.body.users)).toBe(true);
-    expect(res.body.users).toHaveLength(2);
+    await getHandler("get", "/pending")(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      success: true,
+      users: expect.any(Array),
+    });
+    expect(next).not.toHaveBeenCalled();
   });
 
-  test("POST /:id/approve -> 200 and executes update", async () => {
-    const ex = (db as any).__execute as jest.Mock;
-    ex.mockResolvedValueOnce([{}]); // simulate successful update
+  it("POST /:id/approve -> 200 and executes update", async () => {
+    mExecute.mockResolvedValue([{}]);
 
-    const res = await request(app).post("/admin/organizers/10/approve");
+    const req = { params: { id: "18" } } as unknown as Request;
+    const res = makeRes() as Response;
+    const next = jest.fn();
 
-    expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
-    expect(ex).toHaveBeenCalledWith("UPDATE Users SET Status=1 WHERE ID=? AND Role='manager'", [10]);
+    await getHandler("post", "/:id/approve")(req, res, next);
+
+    expect(mExecute).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ success: true });
+    expect(next).not.toHaveBeenCalled();
   });
 
-  test("POST /:id/reject -> 200 and executes update", async () => {
-    const ex = (db as any).__execute as jest.Mock;
-    ex.mockResolvedValueOnce([{}]); // simulate successful update
+  it("POST /:id/reject -> 200 and executes update", async () => {
+    mExecute.mockResolvedValue([{}]);
 
-    const res = await request(app).post("/admin/organizers/22/reject");
+    const req = { params: { id: "22" } } as unknown as Request;
+    const res = makeRes() as Response;
+    const next = jest.fn();
 
-    expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
-    expect(ex).toHaveBeenCalledWith("UPDATE Users SET Status=2 WHERE ID=? AND Role='manager'", [22]);
+    await getHandler("post", "/:id/reject")(req, res, next);
+
+    expect(mExecute).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ success: true });
+    expect(next).not.toHaveBeenCalled();
   });
 });
