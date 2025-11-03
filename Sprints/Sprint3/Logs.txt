@@ -55,3 +55,12 @@ Contributions:
 - Added charts and visual summaries to represent participation and attendance trends (30min)
 - Performed testing and debugging of the analytics routes to ensure accurate data rendering (1h)
 - Wrote automated Jest tests for analytics endpoints to verify data fetching and response structures (1h)
+
+Maria Laghmari
+
+Contributions:
+-Designed and implemented the Admin Dashboard interface (1h)
+-Added manager account approval and rejection functionality for administrators (3h)
+-Implemented backend routes and middleware to handle manager approval logic and status updates (2h)
+-Updated the Manager Dashboard to display current account approval status (1h)
+-Wrote unit tests for admin organizer routes and the ensureActiveManager middleware to verify approval flow (1h)
