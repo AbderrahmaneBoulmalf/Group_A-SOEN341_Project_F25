@@ -65,3 +65,13 @@ Contributions:
 -Implemented backend routes and middleware to handle manager approval logic and status updates (2h)
 -Updated the Manager Dashboard to display current account approval status (1h)
 -Wrote unit tests for admin organizer routes and the ensureActiveManager middleware to verify approval flow (1h)
+
+Mohamed Amine Dakli
+
+Contributions:
+- Designed and implemented admin events interface (30mins)
+- Implemented admin event deletion in the backend (1h30)
+- Designed and implemented the My Events dashboard for manager accounts (30 mins)
+- Added the export attendees list button and implemented it on the backend (1h)
+- Added test cases for both export attendees and delete events (1h)
+-Debugging (2h)
