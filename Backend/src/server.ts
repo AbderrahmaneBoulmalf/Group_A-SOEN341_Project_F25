@@ -13,6 +13,7 @@ import analytics from "./analytics/analytics.js";
 import userService from "./accounts/userService.js";
 import studentEventsController from "./accounts/students/events.js";
 import passRoute from "./routes/passAuth.js";
+import { issuePass } from "./middleware/issuePass.js";
 import exportEventAttendeesCsv from "./events/exportAttendees.js";
 import adminOrganizers from "./accounts/adminOrganizers.js";
 import ensureActiveManager from "./middleware/ensureActiveManager.js";
@@ -291,8 +292,16 @@ app.post(
   studentEventsController.saveEvent
 );
 
-app.use("/student", passRoute);
+// Pass Routes
+app.post(
+  "/student/issue-pass",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("student"),
+  issuePass
+);
+app.use("/internal", passRoute);
 
+// Organizers
 app.use(
   "/admin/organizers",
   authMiddleware.requireAuth,
@@ -308,11 +317,20 @@ app.post(
 );
 app.get("/api/events", events.getEvents);
 
+// Student Routes
 app.get(
   "/student/calendar",
   authMiddleware.requireAuth,
   authMiddleware.requireRole("student"),
   studentEventsController.getCalendarEvents
+);
+
+// Manager Routes
+app.get(
+  "/manager/event/:id/analytics",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("manager"),
+  events.getEventAnalytics
 );
 
 app.get(
@@ -323,13 +341,13 @@ app.get(
 );
 
 // Admin Routes
-
 app.get(
   "/admin/manager-accounts",
   authMiddleware.requireAuth,
   authMiddleware.requireRole("admin"),
   accountManagementController.getManagerAccounts
 );
+
 
 app.post(
   "/admin/reactivate-manager",

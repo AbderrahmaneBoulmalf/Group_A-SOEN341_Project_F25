@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { Spin, message } from "antd";
 import { LoadingOutlined, DownloadOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 
@@ -190,60 +191,64 @@ const MyEvents: React.FC = () => {
           </div>
         )}
         <div className="grid gap-6 md:grid-cols-2">
-          {filteredEvents.map((event) => {
-            const tagList = formatTags(event.tags);
-            return (
-              <div
-                key={event.id}
-                className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+        {filteredEvents.map((event) => {
+  const tagList = formatTags(event.tags);
+  return (
+    <Link
+      key={event.id}
+      to={`/manager/event/${event.id}`}
+      className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
+    >
+      <div className="flex-1">
+        <h3 className="text-xl font-semibold text-slate-900">
+          {event.title}
+        </h3>
+        <p className="mt-1 text-sm text-slate-500">
+          {formatDate(event.date)}
+        </p>
+        {event.location && (
+          <p className="mt-1 text-sm text-slate-600">
+            Location: {event.location}
+          </p>
+        )}
+        {event.description && (
+          <p className="mt-3 text-sm text-slate-700">
+            {event.description}
+          </p>
+        )}
+        {tagList && tagList.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {tagList.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700"
               >
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-slate-900">
-                    {event.title}
-                  </h3>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {formatDate(event.date)}
-                  </p>
-                  {event.location && (
-                    <p className="mt-1 text-sm text-slate-600">
-                      Location: {event.location}
-                    </p>
-                  )}
-                  {event.description && (
-                    <p className="mt-3 text-sm text-slate-700">
-                      {event.description}
-                    </p>
-                  )}
-                  {tagList && tagList.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {tagList.map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="mt-6 flex items-center justify-between">
-                  <div className="text-xs text-slate-500">
-                    Event ID: <span className="font-medium">{event.id}</span>
-                  </div>
-                  <Button
-                    type="button"
-                    onClick={() => handleDownload(event)}
-                    disabled={downloadingId === event.id}
-                    className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
-                  >
-                    <DownloadOutlined />
-                    {downloadingId === event.id ? "Preparing..." : "Export CSV"}
-                  </Button>
-                </div>
-              </div>
-            );
-          })}
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="mt-6 flex items-center justify-between">
+        <div className="text-xs text-slate-500">
+          Event ID: <span className="font-medium">{event.id}</span>
+        </div>
+        <Button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault(); // Prevent Link click
+            handleDownload(event);
+          }}
+          disabled={downloadingId === event.id}
+          className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
+        >
+          <DownloadOutlined />
+          {downloadingId === event.id ? "Preparing..." : "Export CSV"}
+        </Button>
+      </div>
+    </Link>
+  );
+})}
         </div>
       </div>
     </div>

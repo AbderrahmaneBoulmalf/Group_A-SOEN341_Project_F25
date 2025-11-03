@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   home,
@@ -37,11 +38,23 @@ const NavItem: React.FC<Item> = ({ to, label, icon }) => {
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     try {
-      localStorage.removeItem("token");
-    } finally {
-      navigate("/login");
+      const response = await axios.post(
+        "http://localhost:8787/logout",
+        {},
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        navigate("/");
+      } else {
+        console.error("Logout failed:", response.data);
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      navigate("/");
     }
   };
 
@@ -102,7 +115,7 @@ const Sidebar: React.FC = () => {
 
         <button
           onClick={handleLogout}
-          className="mt-2 mb-3 flex items-center gap-3 rounded-lg p-2 text-sm text-red-600 hover:bg-red-50 transition"
+          className="mt-2 mb-3 flex items-center gap-3 rounded-lg p-2 text-sm text-red-600 hover:bg-red-50 transition hover:cursor-pointer"
         >
           <span className="shrink-0">{logout}</span>
           <span>Log out</span>

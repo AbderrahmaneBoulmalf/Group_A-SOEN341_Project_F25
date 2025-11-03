@@ -9,6 +9,7 @@ import axios from "axios";
 const Home: React.FC = () => {
   const date: number = new Date().getFullYear();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const [roleRoute, setRoleRoute] = useState<string>("");
 
   //check backend session
   useEffect(() => {
@@ -21,6 +22,9 @@ const Home: React.FC = () => {
           }
         );
         setIsLoggedIn(response.data.success);
+        const role: string = response.data.role.toLowerCase();
+        const route: string = "/" + role;
+        setRoleRoute(route);
       } catch (error) {
         setIsLoggedIn(false);
       }
@@ -81,7 +85,7 @@ const Home: React.FC = () => {
             </div>
           ) : (
             <div className="flex justify-center items-center mb-16">
-              <Link to="/student" className="w-full sm:w-auto">
+              <Link to={roleRoute} className="w-full sm:w-auto">
                 <Button
                   size="lg"
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-[200px] border-0"
