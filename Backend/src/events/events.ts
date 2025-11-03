@@ -77,32 +77,15 @@ const getEvents = (req: Request, res: Response) => {
 
   let sql = `
     SELECT
-      id,
-      title,
-      date,
-      organization,
-      description,
-      location,
-      category,
-      capacity,
-      price,
-      imageUrl,
-      longDescription,
-      requirements,
-      contactEmail,
-      contactPhone,
-      tags,
-      startTime,
-      endTime,
-      registrationDeadline,
-      isOnline,
-      meetingLink
+      id, title, date, organization, description, location, category,
+      capacity, price, imageUrl, longDescription, requirements,
+      contactEmail, contactPhone, tags, startTime, endTime,
+      registrationDeadline, isOnline, meetingLink
     FROM events
     WHERE 1=1
   `;
   const params: string[] = [];
 
-  // filters
   if (search && search.trim() !== "") {
     sql += ` AND (title LIKE ? OR description LIKE ?)`;
     const like = `%${search.trim()}%`;
@@ -121,10 +104,8 @@ const getEvents = (req: Request, res: Response) => {
     params.push(dateTo.trim());
   }
 
-  // === SORTING (capacity vs date) ===
-  // IMPORTANT: only ONE ORDER BY; DO NOT append another later.
+  // exactly one ORDER BY
   if (sort === "capacity") {
-    // Safest version: NULLs last, highest capacity first, then by date
     sql += ` ORDER BY CASE WHEN capacity IS NULL THEN 1 ELSE 0 END ASC, capacity DESC, \`date\` ASC`;
   } else {
     sql += ` ORDER BY \`date\` ASC`;
@@ -132,7 +113,6 @@ const getEvents = (req: Request, res: Response) => {
 
   db.query<EventRow[]>(sql, params, (err, results) => {
     if (err) {
-      // Log helpful diagnostics during dev
       console.error("GET /api/events SQL:", sql, params);
       console.error(
         "MySQL error:",
@@ -142,42 +122,44 @@ const getEvents = (req: Request, res: Response) => {
       return res.status(500).json({ error: "Failed to fetch events" });
     }
 
-    const processedResults: EventResponse[] = results.map((event) => {
-      let tags: string[] = [];
-      if (event.tags) {
-        try {
-          const parsed = JSON.parse(event.tags);
-          if (Array.isArray(parsed)) {
-            tags = parsed.map((tag) => String(tag).trim()).filter(Boolean);
+    const processedResults: EventResponse[] = results.map(
+      (event): EventResponse => {
+        let tags: string[] = [];
+        if (event.tags) {
+          try {
+            const parsed = JSON.parse(event.tags);
+            if (Array.isArray(parsed)) {
+              tags = parsed.map((tag) => String(tag).trim()).filter(Boolean);
+            }
+          } catch (parseError) {
+            console.warn("Failed to parse event tags:", parseError);
           }
-        } catch (parseError) {
-          console.warn("Failed to parse event tags:", parseError);
         }
-      }
 
-      return {
-        id: event.id,
-        title: event.title,
-        date: event.date,
-        organization: event.organization,
-        description: event.description,
-        location: event.location,
-        category: event.category,
-        capacity: event.capacity ?? undefined,
-        price: event.price ?? undefined,
-        imageUrl: event.imageUrl ?? undefined,
-        longDescription: event.longDescription ?? undefined,
-        requirements: event.requirements ?? undefined,
-        contactEmail: event.contactEmail ?? undefined,
-        contactPhone: event.contactPhone ?? undefined,
-        tags,
-        startTime: event.startTime ?? undefined,
-        endTime: event.endTime ?? undefined,
-        registrationDeadline: event.registrationDeadline ?? undefined,
-        isOnline: Boolean(event.isOnline),
-        meetingLink: event.meetingLink ?? undefined,
-      };
-    });
+        return {
+          id: event.id,
+          title: event.title,
+          date: event.date,
+          organization: event.organization,
+          description: event.description,
+          location: event.location,
+          category: event.category,
+          capacity: event.capacity ?? undefined,
+          price: event.price ?? undefined,
+          imageUrl: event.imageUrl ?? undefined,
+          longDescription: event.longDescription ?? undefined,
+          requirements: event.requirements ?? undefined,
+          contactEmail: event.contactEmail ?? undefined,
+          contactPhone: event.contactPhone ?? undefined,
+          tags,
+          startTime: event.startTime ?? undefined,
+          endTime: event.endTime ?? undefined,
+          registrationDeadline: event.registrationDeadline ?? undefined,
+          isOnline: Boolean(event.isOnline),
+          meetingLink: event.meetingLink ?? undefined,
+        };
+      }
+    );
 
     res.json(processedResults);
   });
