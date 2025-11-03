@@ -24,7 +24,7 @@ import Payment from "@/pages/Payment";
 
 import AdminLayout from "./pages/AdminDashboard/Layout";
 import ApprovalsPage from "./pages/AdminDashboard/ApprovalsPage";
-import ModerationPage from "./pages/AdminDashboard/ModerationPage";
+import EventsPage from "./pages/AdminDashboard/EventsPage";
 import AnalyticsPage from "./pages/AdminDashboard/AnalyticsPage";
 import OrgsRolesPage from "./pages/AdminDashboard/OrgsRolesPage";
 import AdminSettings from "./pages/AdminDashboard/SettingsPage";
@@ -47,7 +47,7 @@ const App: React.FC = () => {
           <Route path="admin" element={<AdminLayout />}>
             <Route index element={<ApprovalsPage />} />
             <Route path="approvals" element={<ApprovalsPage />} />
-            <Route path="moderation" element={<ModerationPage />} />
+            <Route path="events" element={<EventsPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="orgs-roles" element={<OrgsRolesPage />} />
             <Route path="settings" element={<AdminSettings />} />
