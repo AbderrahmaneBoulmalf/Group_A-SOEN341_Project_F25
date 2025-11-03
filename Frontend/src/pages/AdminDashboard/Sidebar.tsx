@@ -5,7 +5,7 @@ import {
   home,
   settings,
   ApprovalsIcon,
-  ModerationIcon,
+  EventsIcon,
   OrgsRolesIcon,
   AnalyticsIcon,
   logout,
@@ -62,7 +62,7 @@ const Sidebar: React.FC = () => {
 
   const navManage: Item[] = [
     { to: "/admin/approvals", label: "Approvals", icon: ApprovalsIcon },
-    { to: "/admin/moderation", label: "Moderation", icon: ModerationIcon },
+    { to: "/admin/events", label: "Events", icon: EventsIcon },
     {
       to: "/admin/orgs-roles",
       label: "Organizations & Roles",

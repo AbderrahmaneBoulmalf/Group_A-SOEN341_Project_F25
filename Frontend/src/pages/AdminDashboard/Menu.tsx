@@ -15,9 +15,9 @@ const Menu: React.FC = () => {
       title: "Approvals",
       text: "Review and approve organizer accounts and event submissions.",
     },
-    "/admin/moderation": {
-      title: "Moderation",
-      text: "Moderate, edit or remove event listings that violate guidelines.",
+    "/admin/events": {
+      title: "Events",
+      text: "Review every event on the platform and remove those that should no longer be listed.",
     },
     "/admin/analytics": {
       title: "Analytics",
