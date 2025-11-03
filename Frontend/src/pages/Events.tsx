@@ -40,7 +40,7 @@ const Events: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        //assuming that the variable capacity is the attendance
+        //assuming that the variable capacity is relevant variable
         const qs = buildQuery({
           search,
           category,
