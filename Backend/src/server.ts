@@ -334,7 +334,7 @@ app.get(
 );
 
 app.get(
-  "/api/events/:eventId/attendees/export",
+  "/manager/events/:eventId/attendees/export",
   authMiddleware.requireAuth,
   authMiddleware.requireRole("manager"),
   exportEventAttendeesCsv
