@@ -48,3 +48,10 @@ Contributions:
 - Added attendance vs capacity pie chart for each event (30 mins)
 - Wrote automated test for the events-analytics function (1h)
 
+Wiame Kotbi
+
+Contributions:
+- Implemented analytics dashboard for administrators displaying total number of events, attendance metrics, and participation trends (2h)
+- Added charts and visual summaries to represent participation and attendance trends (30min)
+- Performed testing and debugging of the analytics routes to ensure accurate data rendering (1h)
+- Wrote automated Jest tests for analytics endpoints to verify data fetching and response structures (1h)
