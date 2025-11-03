@@ -1,26 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { logout } from "../pages/StudentDashboard/SidebarIcons";
 import { Card } from "@/components/ui/card";
 import Logo from "@/assets/logo.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/navbar";
 import axios from "axios";
-
 
 const Home: React.FC = () => {
   const date: number = new Date().getFullYear();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
-  const navigate = useNavigate();
+  const [roleRoute, setRoleRoute] = useState<string>("");
 
   //check backend session
   useEffect(() => {
     const verifySession = async () => {
       try {
-        const response = await axios.get("http://localhost:8787/verify-session", {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          "http://localhost:8787/verify-session",
+          {
+            withCredentials: true,
+          }
+        );
         setIsLoggedIn(response.data.success);
+        const role: string = response.data.role.toLowerCase();
+        const route: string = "/" + role;
+        setRoleRoute(route);
       } catch (error) {
         setIsLoggedIn(false);
       }
@@ -28,33 +32,12 @@ const Home: React.FC = () => {
     verifySession();
   }, []);
 
-  //logout using backend route
-  const handleLogout = async () => {
-    try {
-      await axios.post("http://localhost:8787/logout", {}, { withCredentials: true });
-      setIsLoggedIn(false);
-      navigate("/"); 
-    } catch (error) {
-      console.error("Logout failed", error);
-    }
-  };
-
   if (isLoggedIn === null) {
     return <div className="text-center mt-20">Loading...</div>;
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex flex-col">
-      {isLoggedIn && (
-       <button
-    onClick={handleLogout}
-    className="absolute top-4 right-6 flex items-center space-x-1 rounded-md px-3 py-1 text-sm text-red-500 hover:bg-slate-200 font-medium transition-all duration-200"
-  >
-    {logout}
-    <span>Logout</span>
-  </button>
-
-      )}
       <Navbar />
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow">
@@ -102,7 +85,7 @@ const Home: React.FC = () => {
             </div>
           ) : (
             <div className="flex justify-center items-center mb-16">
-              <Link to="/student" className="w-full sm:w-auto">
+              <Link to={roleRoute} className="w-full sm:w-auto">
                 <Button
                   size="lg"
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 min-w-[200px] border-0"

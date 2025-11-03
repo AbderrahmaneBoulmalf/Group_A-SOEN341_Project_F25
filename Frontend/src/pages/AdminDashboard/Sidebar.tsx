@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   home,
@@ -21,7 +22,10 @@ const NavItem: React.FC<Item> = ({ to, label, icon }) => {
     <Link to={to}>
       <li
         className={`mb-1 flex items-center gap-3 rounded-lg p-2 text-sm transition ${
-          active ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-[#E5E5E5]"
+          active ||
+          (pathname.toLowerCase() === "/admin" && to === "/admin/approvals")
+            ? "bg-blue-600 text-white"
+            : "text-gray-700 hover:bg-[#E5E5E5]"
         }`}
       >
         <span className="shrink-0">{icon}</span>
@@ -34,32 +38,49 @@ const NavItem: React.FC<Item> = ({ to, label, icon }) => {
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     try {
-      localStorage.removeItem("token");
-    } finally {
-      navigate("/login");
+      const response = await axios.post(
+        "http://localhost:8787/logout",
+        {},
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        navigate("/");
+      } else {
+        console.error("Logout failed:", response.data);
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      navigate("/");
     }
   };
 
-  const navTop: Item[] = [{ to: "/admin", label: "Home", icon: home }];
+  const navTop: Item[] = [{ to: "/", label: "Home", icon: home }];
 
   const navManage: Item[] = [
     { to: "/admin/approvals", label: "Approvals", icon: ApprovalsIcon },
     { to: "/admin/moderation", label: "Moderation", icon: ModerationIcon },
-    { to: "/admin/orgs-roles", label: "Organizations & Roles", icon: OrgsRolesIcon },
+    {
+      to: "/admin/orgs-roles",
+      label: "Organizations & Roles",
+      icon: OrgsRolesIcon,
+    },
   ];
 
   const navInsights: Item[] = [
     { to: "/admin/analytics", label: "Analytics", icon: AnalyticsIcon },
   ];
 
-  const navAccount: Item[] = [{ to: "/admin/settings", label: "Settings", icon: settings }];
+  const navAccount: Item[] = [
+    { to: "/admin/settings", label: "Settings", icon: settings },
+  ];
 
   return (
     <div className="w-52 lg:w-64">
       <aside className="fixed w-52 lg:w-64 min-h-screen bg-white/80 backdrop-blur-md p-4 flex flex-col text-sm">
-       
         <div className="flex items-center gap-3 p-2">
           <div className="h-10 w-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
             A
@@ -70,9 +91,8 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
 
-       
         <ul className="mt-6 grow list-none">
-          <li className="mb-2 text-xs text-gray-500">Dashboard</li>
+          <li className="mb-2 text-xs text-gray-500">Navigation</li>
           {navTop.map((it) => (
             <NavItem key={it.to} {...it} />
           ))}
@@ -93,17 +113,18 @@ const Sidebar: React.FC = () => {
           ))}
         </ul>
 
-        
         <button
           onClick={handleLogout}
-          className="mt-2 mb-3 flex items-center gap-3 rounded-lg p-2 text-sm text-red-600 hover:bg-red-50 transition"
+          className="mt-2 mb-3 flex items-center gap-3 rounded-lg p-2 text-sm text-red-600 hover:bg-red-50 transition hover:cursor-pointer"
         >
           <span className="shrink-0">{logout}</span>
           <span>Log out</span>
         </button>
 
-       
-        <Link to="/" className="flex items-center gap-2 p-2 text-xs text-gray-600">
+        <Link
+          to="/"
+          className="flex items-center gap-2 p-2 text-xs text-gray-600"
+        >
           <img src={logo} alt="EventHub" className="h-5 w-5" />
           <span>EventHub • admin</span>
         </Link>

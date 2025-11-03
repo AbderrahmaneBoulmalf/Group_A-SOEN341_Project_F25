@@ -4,7 +4,7 @@ import { QRCode } from "antd";
 import axios from "axios";
 import Navbar from "@/components/navbar";
 
-type IssuePassResponse = { passId: string; expiresAt?: string };
+type IssuePassResponse = { passId: string; expiresAt?: string; error?: string };
 
 export default function PassQRPage() {
   const { eventId } = useParams<{ eventId: string }>();
@@ -25,13 +25,17 @@ export default function PassQRPage() {
     try {
       const { data } = await axios.post<IssuePassResponse>(
         "http://localhost:8787/student/issue-pass",
-        { eventId }, // only send eventId; backend reads userId from session
+        { eventId: Number(eventId) }, // only send eventId; backend reads userId from session
         {
           withCredentials: true,
           headers: { "Content-Type": "application/json" },
         }
       );
-      setPassId(data.passId);
+      if (data.passId) {
+        setPassId(data.passId);
+      } else {
+        setError(data.error || "No pass returned");
+      }
     } catch (e: any) {
       setPassId("");
       setError(e?.response?.data?.error || e.message || "Failed to issue pass");
@@ -122,8 +126,6 @@ export default function PassQRPage() {
                   Pass Created!
                 </div>
                 <br />
-                <span className="font-medium">Pass ID:</span>{" "}
-                <span className="font-mono break-all">{passId}</span>
               </div>
             )}
           </div>
