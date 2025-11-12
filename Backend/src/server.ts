@@ -184,6 +184,24 @@ app.post(
           .json({ success: false, message: "Missing or invalid eventId" });
       }
 
+      // Check event exists and has not already occurred
+      const [eventRows] = await db
+        .promise()
+        .query("SELECT id, date FROM events WHERE id = ?", [eventId]);
+      const eventRow = (eventRows as any[])[0];
+      if (!eventRow) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Event not found" });
+      }
+      const eventDate = new Date(eventRow.date);
+      if (!isNaN(eventDate.getTime()) && eventDate.getTime() < Date.now()) {
+        return res.status(400).json({
+          success: false,
+          message: "Cannot claim ticket for past event",
+        });
+      }
+
       const [existing] = await db
         .promise()
         .query(
@@ -239,6 +257,24 @@ app.post(
         return res
           .status(400)
           .json({ success: false, message: "Invalid payment info" });
+
+      // Check event exists and has not already occurred
+      const [eventRows] = await db
+        .promise()
+        .query("SELECT id, date FROM events WHERE id = ?", [eventId]);
+      const eventRow = (eventRows as any[])[0];
+      if (!eventRow) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Event not found" });
+      }
+      const eventDate = new Date(eventRow.date);
+      if (!isNaN(eventDate.getTime()) && eventDate.getTime() < Date.now()) {
+        return res.status(400).json({
+          success: false,
+          message: "Cannot pay/claim ticket for past event",
+        });
+      }
 
       const [existing] = await db
         .promise()
@@ -347,7 +383,6 @@ app.get(
   authMiddleware.requireRole("admin"),
   accountManagementController.getManagerAccounts
 );
-
 
 app.post(
   "/admin/reactivate-manager",
