@@ -115,6 +115,8 @@ const Events: React.FC = () => {
           });
         }
       } catch (err: any) {
+        // Prefer server-provided message (e.g. registration deadline / past event) when available
+        const serverMsg = err?.response?.data?.message;
         if (err?.response?.status === 409) {
           // Include event id + a unique token so Tickets shows the warning every time
           navigate("/student/tickets", {
@@ -130,6 +132,8 @@ const Events: React.FC = () => {
               String(eventObj.id)
             )}`
           );
+        } else if (serverMsg) {
+          messageApi.open({ type: "warning", content: String(serverMsg) });
         } else {
           messageApi.open({
             type: "error",

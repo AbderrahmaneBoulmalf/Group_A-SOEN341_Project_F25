@@ -125,6 +125,8 @@ const EventDetails: React.FC = () => {
           });
         }
       } catch (err: any) {
+        // Prefer specific server error messages (e.g. past event) before falling back
+        const serverMsg = err?.response?.data?.message;
         if (err?.response?.status === 409) {
           navigate("/student/tickets", {
             state: {
@@ -139,6 +141,8 @@ const EventDetails: React.FC = () => {
               String(eventId)
             )}`
           );
+        } else if (serverMsg) {
+          messageApi.open({ type: "warning", content: String(serverMsg) });
         } else {
           messageApi.open({
             type: "error",
