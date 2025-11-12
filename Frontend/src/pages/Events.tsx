@@ -115,10 +115,9 @@ const Events: React.FC = () => {
           });
         }
       } catch (err: any) {
-        // Prefer server-provided message (e.g. registration deadline / past event) when available
+        // Prefer server-provided message when available
         const serverMsg = err?.response?.data?.message;
         if (err?.response?.status === 409) {
-          // Include event id + a unique token so Tickets shows the warning every time
           navigate("/student/tickets", {
             state: {
               claimError: "already-claimed",
