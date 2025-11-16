@@ -56,6 +56,9 @@ console.log("Database module imported:", db ? "success" : "failed");
 app.post("/register", auth.register);
 app.post("/login", auth.login);
 app.post("/logout", auth.logout);
+app.post("/auth/forgot-password", auth.forgotPassword);
+app.post("/auth/verify-reset-token", auth.verifyToken);
+app.post("/account/resetPassword", auth.resetPassword);
 
 app.get("/verify-session", authMiddleware.requireAuth, (req, res) =>
   res.status(200).json({ success: true, role: req.session.role })
@@ -346,7 +349,6 @@ app.get(
   authMiddleware.requireRole("admin"),
   accountManagementController.getManagerAccounts
 );
-
 
 app.post(
   "/admin/reactivate-manager",
