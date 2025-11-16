@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 
 import db from "./db.js";
 import authMiddleware from "./middleware/authMiddleware.js";
-import auth from "./accounts/auth.js";
+import authModuleController from "./accounts/auth.js";
 import events from "./events/events.js";
 import analytics from "./analytics/analytics.js";
 import userService from "./accounts/userService.js";
@@ -53,12 +53,12 @@ app.use((req, _res, next) => {
 
 console.log("Database module imported:", db ? "success" : "failed");
 
-app.post("/register", auth.register);
-app.post("/login", auth.login);
-app.post("/logout", auth.logout);
-app.post("/auth/forgot-password", auth.forgotPassword);
-app.post("/auth/verify-reset-token", auth.verifyToken);
-app.post("/account/resetPassword", auth.resetPassword);
+app.post("/register", authModuleController.register);
+app.post("/login", authModuleController.login);
+app.post("/logout", authModuleController.logout);
+app.post("/auth/forgot-password", authModuleController.forgotPassword);
+app.post("/auth/verify-reset-token", authModuleController.verifyToken);
+app.post("/account/resetPassword", authModuleController.resetPassword);
 
 app.get("/verify-session", authMiddleware.requireAuth, (req, res) =>
   res.status(200).json({ success: true, role: req.session.role })

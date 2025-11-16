@@ -262,7 +262,7 @@ const resetPassword = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export default {
+const authModuleController = {
   register,
   login,
   logout,
@@ -270,3 +270,4 @@ export default {
   verifyToken,
   resetPassword,
 };
+export default authModuleController;
