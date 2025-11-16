@@ -5,7 +5,7 @@ import {
   home,
   settings,
   ApprovalsIcon,
-  ModerationIcon,
+  EventsIcon,
   OrgsRolesIcon,
   AnalyticsIcon,
   logout,
@@ -62,7 +62,7 @@ const Sidebar: React.FC = () => {
 
   const navManage: Item[] = [
     { to: "/admin/approvals", label: "Approvals", icon: ApprovalsIcon },
-    { to: "/admin/moderation", label: "Moderation", icon: ModerationIcon },
+    { to: "/admin/events", label: "Events", icon: EventsIcon },
     {
       to: "/admin/orgs-roles",
       label: "Organizations & Roles",
@@ -115,7 +115,7 @@ const Sidebar: React.FC = () => {
 
         <button
           onClick={handleLogout}
-          className="mt-2 mb-3 flex items-center gap-3 rounded-lg p-2 text-sm text-red-600 hover:bg-red-50 transition"
+          className="mt-2 mb-3 flex items-center gap-3 rounded-lg p-2 text-sm text-red-600 hover:bg-red-50 transition hover:cursor-pointer"
         >
           <span className="shrink-0">{logout}</span>
           <span>Log out</span>

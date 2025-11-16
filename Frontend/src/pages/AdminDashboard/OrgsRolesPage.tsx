@@ -91,6 +91,7 @@ const OrgsRolesPage: React.FC = () => {
             <ul className="divide-y divide-gray-100">
               {managerAccounts.active.map((account) => (
                 <Popconfirm
+                  key={account.ID}
                   title="Disable Account"
                   description={`Are you sure to disable this account for ${account.Username}?`}
                   okText="Yes"
@@ -98,7 +99,6 @@ const OrgsRolesPage: React.FC = () => {
                   onConfirm={() => deactivateAccount(account.ID)}
                 >
                   <li
-                    key={account.ID}
                     className="py-3 flex justify-between items-center hover:bg-green-50 transition rounded-md px-2 hover:cursor-pointer"
                   >
                     <div>
@@ -166,6 +166,7 @@ const OrgsRolesPage: React.FC = () => {
             <ul className="divide-y divide-gray-100">
               {managerAccounts.disabled.map((account) => (
                 <Popconfirm
+                  key={account.ID}
                   title="Reactivate Account"
                   description={`Are you sure to reactivate this account for ${account.Username}?`}
                   okText="Yes"
@@ -173,7 +174,6 @@ const OrgsRolesPage: React.FC = () => {
                   onConfirm={() => reactivateAccount(account.ID)}
                 >
                   <li
-                    key={account.ID}
                     className="py-3 flex justify-between items-center hover:bg-red-50 transition rounded-md px-2 hover:cursor-pointer"
                   >
                     <div>

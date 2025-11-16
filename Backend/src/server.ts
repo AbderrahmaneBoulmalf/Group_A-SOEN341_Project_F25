@@ -18,6 +18,7 @@ import exportEventAttendeesCsv from "./events/exportAttendees.js";
 import adminOrganizers from "./accounts/adminOrganizers.js";
 import ensureActiveManager from "./middleware/ensureActiveManager.js";
 import accountManagementController from "./accounts/admins/manageAccounts.js";
+import adminEvents from "./events/adminEvents.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
@@ -336,7 +337,7 @@ app.get(
 );
 
 app.get(
-  "/api/events/:eventId/attendees/export",
+  "/manager/events/:eventId/attendees/export",
   authMiddleware.requireAuth,
   authMiddleware.requireRole("manager"),
   exportEventAttendeesCsv
@@ -362,6 +363,12 @@ app.post(
   authMiddleware.requireAuth,
   authMiddleware.requireRole("admin"),
   accountManagementController.deactivateManagerAccount
+);
+app.delete(
+  "/admin/events/:eventId",
+  authMiddleware.requireAuth,
+  authMiddleware.requireRole("admin"),
+  adminEvents.deleteEvent
 );
 // Admin analytics (requires admin role)
 app.get(

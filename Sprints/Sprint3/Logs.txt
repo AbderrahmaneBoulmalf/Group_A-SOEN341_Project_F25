@@ -14,9 +14,64 @@ Contributions:
 Rafael W. Lenz
 
 Contributions:
--Implemented database for holding Ticket/Passes information (15min)
--Implemented backend verification with the database for issuing new Tickets (3.5-4h)
--Set up automated tests for backend pass components (1h)
--Added settings page to manager and admin accounts (20min)
--Meeting Minutes description (5min)
--Mixed Bugfixing (15min)
+- Implemented database for holding Ticket/Passes information (15min)
+- Implemented backend verification with the database for issuing new Tickets (3.5-4h)
+- Set up automated tests for backend pass components (1h)
+- Added settings page to manager and admin accounts (20min)
+- Meeting Minutes description (5min)
+- Mixed Bugfixing (15min)
+
+Abderrahmane Boulmalf
+
+Contributions:
+- Updated the frontend events listing search fitler and added a button (30min)
+- Implemented backend modifications to allow the sorting of events (1h)
+- Updated the getevents function in events/events (30min)
+- Implemented testing (1h)
+- Debugging (2h)
+
+Sofian Boutamo
+
+Contributions:
+- Implemented mock payment page for claiming paid tickets, including payment form and validation (2h)
+- Added loading screen animation to simulate real payment processing flow (30min)
+- Added success/error notifications after ticket is successfully claimed/claiming a ticket that was already claimed (30min)
+- Performed debugging across the codebase, focusing on logic issues related to the ticket claiming flow (2–3h)
+- Wrote automated test to verify payment + claim logic (1h)
+- fixed import bugs (5mins)
+
+Ziad Agha
+
+Contributions:
+- fixed event filtering when a manager views their own events after logging in (1h)
+- Added button functionality for the events in the manager dashboard (30 mins)
+- Implemented events analytics for manager events displaying revenue, attendance and tickets sold (2h)
+- Added attendance vs capacity pie chart for each event (30 mins)
+- Wrote automated test for the events-analytics function (1h)
+
+Wiame Kotbi
+
+Contributions:
+- Implemented analytics dashboard for administrators displaying total number of events, attendance metrics, and participation trends (2h)
+- Added charts and visual summaries to represent participation and attendance trends (30min)
+- Performed testing and debugging of the analytics routes to ensure accurate data rendering (1h)
+- Wrote automated Jest tests for analytics endpoints to verify data fetching and response structures (1h)
+
+Maria Laghmari
+
+Contributions:
+-Designed and implemented the Admin Dashboard interface (1h)
+-Added manager account approval and rejection functionality for administrators (3h)
+-Implemented backend routes and middleware to handle manager approval logic and status updates (2h)
+-Updated the Manager Dashboard to display current account approval status (1h)
+-Wrote unit tests for admin organizer routes and the ensureActiveManager middleware to verify approval flow (1h)
+
+Mohamed Amine Dakli
+
+Contributions:
+- Designed and implemented admin events interface (30mins)
+- Implemented admin event deletion in the backend (1h30)
+- Designed and implemented the My Events dashboard for manager accounts (30 mins)
+- Added the export attendees list button and implemented it on the backend (1h)
+- Added test cases for both export attendees and delete events (1h)
+-Debugging (2h)
