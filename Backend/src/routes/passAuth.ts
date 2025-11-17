@@ -16,12 +16,14 @@ router.post("/passes", async (req, res) => {
       return res.status(400).json({ error: "Invalid payload" });
     }
 
-    await pool
-      .promise()
-      .execute(
-        "INSERT INTO TicketPasses (`pass`, user_id, event_id, valid) VALUES (?, ?, ?, 1)",
-        [passKey, user_id, event_id]
-      );
+    await pool.promise().execute(
+      `INSERT INTO TicketPasses (\`pass\`, user_id, event_id, valid)
+     VALUES (?, ?, ?, 1)
+     ON DUPLICATE KEY UPDATE
+       \`pass\` = VALUES(\`pass\`),
+       valid = 1`,
+      [passKey, user_id, event_id]
+    );
 
     return res.status(201).json({ ok: true });
   } catch (err) {
