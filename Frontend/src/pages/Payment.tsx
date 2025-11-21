@@ -85,6 +85,12 @@ const Payment: React.FC = () => {
                   },
                 });
                 return;
+              } else if (err?.response?.status === 400) {
+                showMessage({
+                  type: "error",
+                  content: "Sorry, the event is fully booked.",
+                });
+                return;
               } else {
                 showMessage({
                   type: "error",

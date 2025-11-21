@@ -133,6 +133,11 @@ const Tickets: React.FC = () => {
                   type: "warning",
                   content: "Ticket already claimed.",
                 });
+              } else if (err?.response?.status === 400) {
+                showMessage({
+                  type: "error",
+                  content: "Sorry, the event is fully booked.",
+                });
               } else if (err?.response?.status === 401) {
                 showMessage({
                   type: "warning",

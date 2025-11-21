@@ -124,6 +124,11 @@ const Events: React.FC = () => {
               claimToken: Date.now(),
             },
           });
+        } else if (err?.response?.status === 400) {
+          messageApi.open({
+            type: "error",
+            content: "Sorry, the event is fully booked.",
+          });
         } else if (err?.response?.status === 401) {
           navigate(
             `/login?redirectTo=/student/tickets&claimEventId=${encodeURIComponent(
