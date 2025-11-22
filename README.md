@@ -1,57 +1,74 @@
+# SOEN341
 
-# SOEN341  
 SOEN 341 Campus Events & Ticketing Project - Fall 2025
 
-## Team Members  
+## Team Members
 
-| Name                  | Student ID | GitHub Profile       |  
-|-----------------------|------------|----------------------|  
-| Abderrahmane Boulmalf | 40272217   | AbderrahmaneBoulmalf |  
-| Rafael Wilian Lenz    | 40259696   | RafaelL0311          |  
-| Wiâme Kotbi           | 40299105   | wiamekotbi           |  
-| Maria Laghmari        | 40297167   | marialagh            |  
-| Mohamed Amine Dakli   | 40318182   | aminedakli           |  
-| Sami Erafii           | 40300564   | serafii              |  
-| Ziad Agha             | 40312869   | Ziad-Agha            |  
-| Sofian Boutamo        | 40313874   | amarsoul             |  
+| Name                  | Student ID | GitHub Profile       |
+| --------------------- | ---------- | -------------------- |
+| Abderrahmane Boulmalf | 40272217   | AbderrahmaneBoulmalf |
+| Rafael Wilian Lenz    | 40259696   | RafaelL0311          |
+| Wiâme Kotbi           | 40299105   | wiamekotbi           |
+| Maria Laghmari        | 40297167   | marialagh            |
+| Mohamed Amine Dakli   | 40318182   | aminedakli           |
+| Sami Erafii           | 40300564   | serafii              |
+| Ziad Agha             | 40312869   | Ziad-Agha            |
+| Sofian Boutamo        | 40313874   | amarsoul             |
 
-## Project Description  
+## Project Description
 
-This project is about developing a Campus Events & Ticketing Web Application to help students discover, organize, and attend events on campus. Students can browse events, save them, claim free or paid tickets, and check in using QR codes. Organizers will be able to create and manage events, track attendance, and access analytics through dashboards, while administrators will oversee accounts, moderate events, and manage organizations.  
+This project is about developing a Campus Events & Ticketing Web Application to help students discover, organize, and attend events on campus. Students can browse events, save them, claim free or paid tickets, and check in using QR codes. Organizers will be able to create and manage events, track attendance, and access analytics through dashboards, while administrators will oversee accounts, moderate events, and manage organizations.
 
-## Specifications  
+## Specifications
 
-- **Frontend**: React / TypeScript  
-- **Backend**: Express.js  
-- **Database**: MySQL  
+- **Frontend**: React / TypeScript
+- **Backend**: Express.js
+- **Database**: MySQL
 
-## Features  
+## Features
 
-Three core features (and one additional feature) will be implemented in this web app.  
+Three core features (and one additional feature) will be implemented in this web app.
 
-### 1. Student Event Experience  
-Students will be able to:  
-- Browse and search events with filters (date, category, organization).  
-- Save events to a personal calendar.  
-- Claim tickets (free or paid).  
-- Receive a unique QR-code digital ticket.  
+### 1. Student Event Experience
 
-### 2. Organizer Event Management  
-Organizers will be able to:  
-- Create events by entering details such as title, description, date/time, location, ticket capacity, and type.  
-- Track event analytics with dashboards showing tickets issued, attendance, and capacity.  
-- Export attendee lists in CSV format.  
-- Validate tickets with an integrated QR scanner.  
-
-### 3. Administrator Dashboard & Moderation  
-Administrators will be able to:  
-- Approve organizer accounts.  
-- Moderate event listings to ensure compliance.  
-- View global statistics such as number of events, tickets issued, and participation trends.  
-- Manage organizations and assign roles.  
-
-### 4. Additional Feature (Student Event Calendar)  
 Students will be able to:
+
+- Browse and search events with filters (date, category, organization).
+- Save events to a personal calendar.
+- Claim tickets (free or paid).
+- Receive a unique QR-code digital ticket.
+
+### 2. Organizer Event Management
+
+Organizers will be able to:
+
+- Create events by entering details such as title, description, date/time, location, ticket capacity, and type.
+- Track event analytics with dashboards showing tickets issued, attendance, and capacity.
+- Export attendee lists in CSV format.
+- Validate tickets with an integrated QR scanner.
+
+### 3. Administrator Dashboard & Moderation
+
+Administrators will be able to:
+
+- Approve organizer accounts.
+- Moderate event listings to ensure compliance.
+- View global statistics such as number of events, tickets issued, and participation trends.
+- Manage organizations and assign roles.
+
+### 4. Additional Feature (Student Event Calendar)
+
+Students will be able to:
+
 - View their upcoming and past events in a calendar format directly from their dashboard.
 - Click on events to view details such as date, time, and location.
 - See both saved and registered events displayed visually for easy tracking.
+
+## Testing Instructions
+
+- Fork the Repository
+- Contact developers for environment variables
+- Create a `.env` file at the root of the project with the environment variables
+- Run `npm run dev` in both `Frontend` and `Backend` directories
+- Access the web interface via `http://localhost:5173`
+  <img width="2557" height="1272" alt="image" src="https://github.com/user-attachments/assets/aa73146e-f0bc-427d-9989-125b8e229430" />
