@@ -23,6 +23,7 @@ const Register: React.FC = () => {
   const [passwordTouched, setPasswordTouched] = useState<boolean>(false);
   const [confirmPasswordTouched, setConfirmPasswordTouched] = useState<boolean>(false);
   const [showErrors, setShowErrors] = useState<boolean>(false);
+  const [duplicateEmailError, setDuplicateEmailError] = useState<string | null>(null);
   const [accountType, setAccountType] = useState<string>(""); // "" = not selected
   const timerRef = React.useRef<number | null>(null);
 
@@ -60,7 +61,7 @@ const Register: React.FC = () => {
   // submit
   const signUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  setShowErrors(true);
+    setShowErrors(true);
   if (!isFormValid || submitting || !accountType) return;
     setSubmitting(true);
     try {
@@ -89,7 +90,11 @@ const Register: React.FC = () => {
         e.response?.statusText ||
         e.message ||
         "Registration failed.";
-      message.error(msg);
+      if (e.response?.status === 409) {
+        setDuplicateEmailError("Email already in use.");
+        setEmailTouched(true);
+      }
+      messageApi.error(msg);
       console.error(e);
     } finally {
       setSubmitting(false);
@@ -181,16 +186,23 @@ const Register: React.FC = () => {
                         value={email}
                         onChange={(e) => {
                           if (!emailTouched) setEmailTouched(true);
+                          if (duplicateEmailError) setDuplicateEmailError(null);
                           setEmail(e.target.value);
                         }}
                         className={`mt-2 w-full rounded-lg border px-4 py-3 text-slate-800 outline-none focus:ring-2 bg-slate-50 ${
-                          (emailTouched || showErrors) && !isEmailValid
+                          ((emailTouched || showErrors) && !isEmailValid) ||
+                          duplicateEmailError
                             ? "border-red-500 focus:border-red-500 focus:ring-red-300"
                             : "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
                         }`}
                         placeholder="Enter your email"
                       />
-                      {(emailTouched || showErrors) && !isEmailValid && (
+                      {duplicateEmailError && (
+                        <p className="mt-1 text-sm text-red-500">
+                          {duplicateEmailError}
+                        </p>
+                      )}
+                      {(emailTouched || showErrors) && !isEmailValid && !duplicateEmailError && (
                         <p className="mt-1 text-sm text-red-500">
                           Please enter a valid email address.
                         </p>
@@ -312,16 +324,23 @@ const Register: React.FC = () => {
                         value={email}
                         onChange={(e) => {
                           if (!emailTouched) setEmailTouched(true);
+                          if (duplicateEmailError) setDuplicateEmailError(null);
                           setEmail(e.target.value);
                         }}
                         className={`mt-2 w-full rounded-lg border px-4 py-3 text-slate-800 outline-none focus:ring-2 bg-slate-50 ${
-                          (emailTouched || showErrors) && !isEmailValid
+                          ((emailTouched || showErrors) && !isEmailValid) ||
+                          duplicateEmailError
                             ? "border-red-500 focus:border-red-500 focus:ring-red-300"
                             : "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
                         }`}
                         placeholder="Enter your email"
                       />
-                      {(emailTouched || showErrors) && !isEmailValid && (
+                      {duplicateEmailError && (
+                        <p className="mt-1 text-sm text-red-500">
+                          {duplicateEmailError}
+                        </p>
+                      )}
+                      {(emailTouched || showErrors) && !isEmailValid && !duplicateEmailError && (
                         <p className="mt-1 text-sm text-red-500">
                           Please enter a valid email address.
                         </p>
