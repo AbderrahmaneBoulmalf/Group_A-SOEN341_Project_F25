@@ -12,3 +12,12 @@ Contributions:
 -Bugfixed QR Code Generation Issues (2.5h)
 -Changed Error Messages (5min)
 -Worked on Presentation Slides (45min)
+
+Wiame Kotbi 
+
+Contributions:
+- Fixed the Contact Us page so that emails are sent to our inbox (30min)
+- Added acceptance tests for US.06 (10min)
+- Fixed signup form validation so error messages only appear after user input (30min)
+- Fixed the check during signup so existing emails show a proper error (15min)
+- Wrote the Infrastructure section of the project report (1h)
