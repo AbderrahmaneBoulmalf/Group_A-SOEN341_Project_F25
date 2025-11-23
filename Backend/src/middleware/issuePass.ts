@@ -41,9 +41,10 @@ export async function issuePass(req: Request, res: Response) {
         break;
       default: {
         console.error("getPasses unexpected:", response.status, response.data);
-        return res
-          .status(502)
-          .json({ error: "upstream_error_get", status: response.status });
+        return res.status(502).json({
+          error: "Error Getting Pass. Contact Support for Help.",
+          status: response.status,
+        });
       }
     }
 
@@ -59,31 +60,22 @@ export async function issuePass(req: Request, res: Response) {
 
     if (postResp.status !== 201 && postResp.status !== 200) {
       console.error("insert pass unexpected:", postResp.status, postResp.data);
-      return res
-        .status(502)
-        .json({ error: "upstream_error_post", status: postResp.status });
+      return res.status(502).json({
+        error: "Error Creating Pass. Contact Support for Help.",
+        status: postResp.status,
+      });
     }
 
     return res.status(201).json({ passId });
   } catch (err: any) {
     console.error(
-      "issue pass error:",
+      "Error issuing Pass. Contact Support for Help.",
       err?.response?.data ?? err?.message ?? err
     );
-    return res.status(500).json({ error: "internal_error" });
+    return res
+      .status(500)
+      .json({ error: "Internal Error. Contact Support for Help." });
   }
-
-  //get eventId from frontend
-  //search database for existing pass for userId and eventId
-  //if status = 200 return passId
-
-  //if status = 404 generate new passId
-
-  //read userId from the session
-
-  //generate passId
-
-  //add to database later
 }
 
 export default issuePass;
