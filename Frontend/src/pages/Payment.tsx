@@ -86,6 +86,12 @@ const Payment: React.FC = () => {
                   },
                 });
                 return;
+              } else if (err?.response?.status === 400) {
+                showMessage({
+                  type: "error",
+                  content: "Sorry, the event is fully booked.",
+                });
+                return;
               } else if (err?.response?.status === 401) {
                 // if session expired, redirect to login preserving claimEventId
                 navigate(

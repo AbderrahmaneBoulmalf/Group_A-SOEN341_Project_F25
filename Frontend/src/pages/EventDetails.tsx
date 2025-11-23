@@ -135,6 +135,11 @@ const EventDetails: React.FC = () => {
               claimToken: Date.now(),
             },
           });
+        } else if (err?.response?.status === 400) {
+          messageApi.open({
+            type: "error",
+            content: "Sorry, the event is fully booked.",
+          });
         } else if (err?.response?.status === 401) {
           navigate(
             `/login?redirectTo=/student/tickets&claimEventId=${encodeURIComponent(
@@ -436,7 +441,7 @@ const EventDetails: React.FC = () => {
                 )}
 
                 {/* Capacity */}
-                {event.capacity && (
+                {event.capacity !== undefined && event.capacity !== null && (
                   <div className="flex items-start">
                     <svg
                       className="w-5 h-5 mr-3 mt-0.5 text-blue-600"
@@ -454,7 +459,9 @@ const EventDetails: React.FC = () => {
                     <div>
                       <div className="font-medium text-slate-800">Capacity</div>
                       <div className="text-sm text-slate-600">
-                        {event.capacity} attendees
+                        {Number(event.capacity) === 0
+                          ? "Full"
+                          : `${event.capacity} attendees`}
                       </div>
                     </div>
                   </div>
