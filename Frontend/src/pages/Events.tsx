@@ -77,6 +77,15 @@ const Events: React.FC = () => {
     });
 
   const handleClaim = async (eventObj: Event) => {
+    // Check if event is full
+    if (Number(eventObj.capacity) === 0) {
+      messageApi.open({
+        type: "error",
+        content: "Sorry, no more tickets left, event is full",
+      });
+      return;
+    }
+
     // If the event is free, attempt to claim immediately (no payment page)
     if (Number(eventObj.price) === 0) {
       try {
@@ -343,9 +352,14 @@ const Events: React.FC = () => {
               </Button>
               <Button
                 onClick={() => handleClaim(event)}
-                className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+                className={`w-full mt-2 font-semibold py-2 px-4 rounded-lg transition-colors duration-200 ${
+                  Number(event.capacity) === 0
+                    ? "bg-gray-400 hover:bg-gray-400 cursor-not-allowed text-white"
+                    : "bg-green-600 hover:bg-green-700 text-white"
+                }`}
+                disabled={Number(event.capacity) === 0}
               >
-                Claim Ticket
+                {Number(event.capacity) === 0 ? "Event Full" : "Claim Ticket"}
               </Button>
             </Card>
           ))}

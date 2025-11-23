@@ -187,16 +187,18 @@ app.post(
           .json({ success: false, message: "Missing or invalid eventId" });
       }
 
-      // Check event exists and has not already occurred
+      // Check event exists, has capacity, and has not already occurred
       const [eventRows] = await db
         .promise()
-        .query("SELECT id, date FROM events WHERE id = ?", [eventId]);
+        .query("SELECT id, date, capacity FROM events WHERE id = ?", [eventId]);
       const eventRow = (eventRows as any[])[0];
       if (!eventRow) {
         return res
           .status(404)
           .json({ success: false, message: "Event not found" });
       }
+
+      // Check if event is in the past
       const eventDate = new Date(eventRow.date);
       if (!isNaN(eventDate.getTime()) && eventDate.getTime() < Date.now()) {
         return res.status(400).json({
@@ -205,6 +207,16 @@ app.post(
         });
       }
 
+      // Check capacity
+      const capacity = Number(eventRow.capacity);
+      if (!Number.isFinite(capacity) || capacity <= 0) {
+        return res.status(409).json({
+          success: false,
+          message: "Sorry, no more tickets left, event is full",
+        });
+      }
+
+      // Check if student already claimed this event
       const [existing] = await db
         .promise()
         .query(
@@ -217,12 +229,20 @@ app.post(
           .json({ success: false, message: "Ticket already claimed" });
       }
 
+      // Insert ticket and decrement capacity in a transaction-like manner
       const [insertResult] = await db
         .promise()
         .query(
           "INSERT INTO ClaimedTickets (student_id, event_id) VALUES (?, ?)",
           [studentId, eventId]
         );
+
+      // Decrement capacity
+      await db
+        .promise()
+        .query("UPDATE events SET capacity = capacity - 1 WHERE id = ?", [
+          eventId,
+        ]);
 
       return res.status(200).json({
         success: true,
@@ -261,16 +281,18 @@ app.post(
           .status(400)
           .json({ success: false, message: "Invalid payment info" });
 
-      // Check event exists and has not already occurred
+      // Check event exists, has capacity, and has not already occurred
       const [eventRows] = await db
         .promise()
-        .query("SELECT id, date FROM events WHERE id = ?", [eventId]);
+        .query("SELECT id, date, capacity FROM events WHERE id = ?", [eventId]);
       const eventRow = (eventRows as any[])[0];
       if (!eventRow) {
         return res
           .status(404)
           .json({ success: false, message: "Event not found" });
       }
+
+      // Check if event is in the past
       const eventDate = new Date(eventRow.date);
       if (!isNaN(eventDate.getTime()) && eventDate.getTime() < Date.now()) {
         return res.status(400).json({
@@ -279,6 +301,16 @@ app.post(
         });
       }
 
+      // Check capacity
+      const capacity = Number(eventRow.capacity);
+      if (!Number.isFinite(capacity) || capacity <= 0) {
+        return res.status(409).json({
+          success: false,
+          message: "Sorry, no more tickets left, event is full",
+        });
+      }
+
+      // Check if student already claimed this event
       const [existing] = await db
         .promise()
         .query(
@@ -290,12 +322,20 @@ app.post(
           .status(409)
           .json({ success: false, message: "Ticket already claimed" });
 
+      // Insert ticket and decrement capacity
       const [insertResult] = await db
         .promise()
         .query(
           "INSERT INTO ClaimedTickets (student_id, event_id) VALUES (?, ?)",
           [studentId, eventId]
         );
+
+      // Decrement capacity
+      await db
+        .promise()
+        .query("UPDATE events SET capacity = capacity - 1 WHERE id = ?", [
+          eventId,
+        ]);
 
       return res.status(200).json({
         success: true,

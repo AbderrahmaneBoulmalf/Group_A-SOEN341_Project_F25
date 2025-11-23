@@ -87,6 +87,15 @@ const EventDetails: React.FC = () => {
   const handleGetTicket = async (eventId?: string) => {
     if (!eventId) return;
 
+    // Check if event is full
+    if (Number(event?.capacity) === 0) {
+      messageApi.open({
+        type: "error",
+        content: "Sorry, no more tickets left, event is full",
+      });
+      return;
+    }
+
     // If event is free, claim directly
     const price = event?.price;
     if (Number(price) === 0) {
@@ -436,7 +445,7 @@ const EventDetails: React.FC = () => {
                 )}
 
                 {/* Capacity */}
-                {event.capacity && (
+                {event.capacity !== undefined && event.capacity !== null && (
                   <div className="flex items-start">
                     <svg
                       className="w-5 h-5 mr-3 mt-0.5 text-blue-600"
@@ -453,8 +462,16 @@ const EventDetails: React.FC = () => {
                     </svg>
                     <div>
                       <div className="font-medium text-slate-800">Capacity</div>
-                      <div className="text-sm text-slate-600">
-                        {event.capacity} attendees
+                      <div
+                        className={`text-sm ${
+                          Number(event.capacity) === 0
+                            ? "text-red-600 font-semibold"
+                            : "text-slate-600"
+                        }`}
+                      >
+                        {Number(event.capacity) === 0
+                          ? "Event capacity is full"
+                          : `${event.capacity} attendees`}
                       </div>
                     </div>
                   </div>
@@ -516,10 +533,15 @@ const EventDetails: React.FC = () => {
               {/* Action Buttons */}
               <div className="mt-6 space-y-3">
                 <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3"
+                  className={`w-full font-semibold py-3 ${
+                    Number(event?.capacity) === 0
+                      ? "bg-gray-400 hover:bg-gray-400 cursor-not-allowed text-white"
+                      : "bg-blue-600 hover:bg-blue-700 text-white"
+                  }`}
                   onClick={() => handleGetTicket(id)}
+                  disabled={Number(event?.capacity) === 0}
                 >
-                  Get Ticket
+                  {Number(event?.capacity) === 0 ? "Event Full" : "Get Ticket"}
                 </Button>
                 <Button
                   variant="outline"
