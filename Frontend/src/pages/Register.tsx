@@ -19,6 +19,11 @@ const Register: React.FC = () => {
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
   const [isPswValid, setPswValid] = useState<boolean>(false);
   const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
+  const [emailTouched, setEmailTouched] = useState<boolean>(false);
+  const [passwordTouched, setPasswordTouched] = useState<boolean>(false);
+  const [confirmPasswordTouched, setConfirmPasswordTouched] = useState<boolean>(false);
+  const [showErrors, setShowErrors] = useState<boolean>(false);
+  const [duplicateEmailError, setDuplicateEmailError] = useState<string | null>(null);
   const [accountType, setAccountType] = useState<string>(""); // "" = not selected
   const timerRef = React.useRef<number | null>(null);
 
@@ -56,7 +61,8 @@ const Register: React.FC = () => {
   // submit
   const signUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!isFormValid || submitting || !accountType) return;
+    setShowErrors(true);
+  if (!isFormValid || submitting || !accountType) return;
     setSubmitting(true);
     try {
       const response = await axios.post("http://localhost:8787/register", {
@@ -84,7 +90,11 @@ const Register: React.FC = () => {
         e.response?.statusText ||
         e.message ||
         "Registration failed.";
-      message.error(msg);
+      if (e.response?.status === 409) {
+        setDuplicateEmailError("Email already in use.");
+        setEmailTouched(true);
+      }
+      messageApi.error(msg);
       console.error(e);
     } finally {
       setSubmitting(false);
@@ -174,17 +184,25 @@ const Register: React.FC = () => {
                         type="email"
                         autoComplete="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                          if (!emailTouched) setEmailTouched(true);
+                          if (duplicateEmailError) setDuplicateEmailError(null);
+                          setEmail(e.target.value);
+                        }}
                         className={`mt-2 w-full rounded-lg border px-4 py-3 text-slate-800 outline-none focus:ring-2 bg-slate-50 ${
-                          email
-                            ? isEmailValid
-                              ? "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
-                              : "border-red-500 focus:border-red-500 focus:ring-red-300"
+                          ((emailTouched || showErrors) && !isEmailValid) ||
+                          duplicateEmailError
+                            ? "border-red-500 focus:border-red-500 focus:ring-red-300"
                             : "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
                         }`}
                         placeholder="Enter your email"
                       />
-                      {!isEmailValid && email.length > 0 && (
+                      {duplicateEmailError && (
+                        <p className="mt-1 text-sm text-red-500">
+                          {duplicateEmailError}
+                        </p>
+                      )}
+                      {(emailTouched || showErrors) && !isEmailValid && !duplicateEmailError && (
                         <p className="mt-1 text-sm text-red-500">
                           Please enter a valid email address.
                         </p>
@@ -204,26 +222,31 @@ const Register: React.FC = () => {
                         type="password"
                         autoComplete="new-password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => {
+                          if (!passwordTouched) setPasswordTouched(true);
+                          setPassword(e.target.value);
+                        }}
                         className={`mt-2 w-full rounded-lg border px-4 py-3 text-slate-800 outline-none focus:ring-2 bg-yellow-50 ${
-                          password
-                            ? PASSWORD_REGEX.test(password)
-                              ? "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
-                              : "border-red-500 focus:border-red-500 focus:ring-red-300"
+                          (passwordTouched || showErrors) && !PASSWORD_REGEX.test(password)
+                            ? "border-red-500 focus:border-red-500 focus:ring-red-300"
+                            : password
+                            ? "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
                             : "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
                         }`}
                         placeholder="Enter a password"
                       />
-                      <p
-                        className={`mt-1 text-sm ${
-                          PASSWORD_REGEX.test(password)
-                            ? "text-slate-500"
-                            : "text-red-500"
-                        }`}
-                      >
-                        Must be at least 8 characters long and include at least
-                        one number.
-                      </p>
+                      {(passwordTouched || showErrors) && (
+                        <p
+                          className={`mt-1 text-sm ${
+                            PASSWORD_REGEX.test(password)
+                              ? "text-slate-500"
+                              : "text-red-500"
+                          }`}
+                        >
+                          Must be at least 8 characters long and include at
+                          least one number.
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -239,21 +262,27 @@ const Register: React.FC = () => {
                         type="password"
                         autoComplete="new-password"
                         value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        onChange={(e) => {
+                          if (!confirmPasswordTouched)
+                            setConfirmPasswordTouched(true);
+                          setConfirmPassword(e.target.value);
+                        }}
                         className={`mt-2 w-full rounded-lg border px-4 py-3 text-slate-800 outline-none focus:ring-2 bg-yellow-50 ${
-                          confirmPassword
-                            ? password === confirmPassword
-                              ? "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
-                              : "border-red-500 focus:border-red-500 focus:ring-red-300"
+                          (confirmPasswordTouched || showErrors) &&
+                          password !== confirmPassword
+                            ? "border-red-500 focus:border-red-500 focus:ring-red-300"
+                            : confirmPassword
+                            ? "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
                             : "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
                         }`}
                         placeholder="Confirm your password"
                       />
-                      {confirmPassword && password !== confirmPassword && (
+                      {(confirmPasswordTouched || showErrors) &&
+                        password !== confirmPassword && (
                         <p className="mt-1 text-sm text-red-500">
                           Passwords do not match.
                         </p>
-                      )}
+                        )}
                     </div>
                   </>
                 )}
@@ -293,17 +322,25 @@ const Register: React.FC = () => {
                         type="email"
                         autoComplete="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                          if (!emailTouched) setEmailTouched(true);
+                          if (duplicateEmailError) setDuplicateEmailError(null);
+                          setEmail(e.target.value);
+                        }}
                         className={`mt-2 w-full rounded-lg border px-4 py-3 text-slate-800 outline-none focus:ring-2 bg-slate-50 ${
-                          email
-                            ? isEmailValid
-                              ? "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
-                              : "border-red-500 focus:border-red-500 focus:ring-red-300"
+                          ((emailTouched || showErrors) && !isEmailValid) ||
+                          duplicateEmailError
+                            ? "border-red-500 focus:border-red-500 focus:ring-red-300"
                             : "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
                         }`}
                         placeholder="Enter your email"
                       />
-                      {!isEmailValid && email.length > 0 && (
+                      {duplicateEmailError && (
+                        <p className="mt-1 text-sm text-red-500">
+                          {duplicateEmailError}
+                        </p>
+                      )}
+                      {(emailTouched || showErrors) && !isEmailValid && !duplicateEmailError && (
                         <p className="mt-1 text-sm text-red-500">
                           Please enter a valid email address.
                         </p>
@@ -323,26 +360,31 @@ const Register: React.FC = () => {
                         type="password"
                         autoComplete="new-password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => {
+                          if (!passwordTouched) setPasswordTouched(true);
+                          setPassword(e.target.value);
+                        }}
                         className={`mt-2 w-full rounded-lg border px-4 py-3 text-slate-800 outline-none focus:ring-2 bg-yellow-50 ${
-                          password
-                            ? PASSWORD_REGEX.test(password)
-                              ? "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
-                              : "border-red-500 focus:border-red-500 focus:ring-red-300"
+                          (passwordTouched || showErrors) && !PASSWORD_REGEX.test(password)
+                            ? "border-red-500 focus:border-red-500 focus:ring-red-300"
+                            : password
+                            ? "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
                             : "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
                         }`}
                         placeholder="Enter a password"
                       />
-                      <p
-                        className={`mt-1 text-sm ${
-                          PASSWORD_REGEX.test(password)
-                            ? "text-slate-500"
-                            : "text-red-500"
-                        }`}
-                      >
-                        Must be at least 8 characters long and include at least
-                        one number.
-                      </p>
+                      {(passwordTouched || showErrors) && (
+                        <p
+                          className={`mt-1 text-sm ${
+                            PASSWORD_REGEX.test(password)
+                              ? "text-slate-500"
+                              : "text-red-500"
+                          }`}
+                        >
+                          Must be at least 8 characters long and include at
+                          least one number.
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -358,21 +400,27 @@ const Register: React.FC = () => {
                         type="password"
                         autoComplete="new-password"
                         value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        onChange={(e) => {
+                          if (!confirmPasswordTouched)
+                            setConfirmPasswordTouched(true);
+                          setConfirmPassword(e.target.value);
+                        }}
                         className={`mt-2 w-full rounded-lg border px-4 py-3 text-slate-800 outline-none focus:ring-2 bg-yellow-50 ${
-                          confirmPassword
-                            ? password === confirmPassword
-                              ? "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
-                              : "border-red-500 focus:border-red-500 focus:ring-red-300"
+                          (confirmPasswordTouched || showErrors) &&
+                          password !== confirmPassword
+                            ? "border-red-500 focus:border-red-500 focus:ring-red-300"
+                            : confirmPassword
+                            ? "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
                             : "border-slate-300 focus:border-blue-400 focus:ring-blue-400"
                         }`}
                         placeholder="Confirm your password"
                       />
-                      {confirmPassword && password !== confirmPassword && (
+                      {(confirmPasswordTouched || showErrors) &&
+                        password !== confirmPassword && (
                         <p className="mt-1 text-sm text-red-500">
                           Passwords do not match.
                         </p>
-                      )}
+                        )}
                     </div>
                   </>
                 )}
