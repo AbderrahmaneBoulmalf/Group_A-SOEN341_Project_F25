@@ -19,6 +19,7 @@ import adminOrganizers from "./accounts/adminOrganizers.js";
 import ensureActiveManager from "./middleware/ensureActiveManager.js";
 import accountManagementController from "./accounts/admins/manageAccounts.js";
 import adminEvents from "./events/adminEvents.js";
+import contactController from "./contact/contact.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
@@ -60,6 +61,7 @@ app.post("/logout", authModuleController.logout);
 app.post("/auth/forgot-password", authModuleController.forgotPassword);
 app.post("/auth/verify-reset-token", authModuleController.verifyToken);
 app.post("/account/resetPassword", authModuleController.resetPassword);
+app.post("/contact/send", contactController.sendContactMessage);
 
 app.get("/verify-session", authMiddleware.requireAuth, (req, res) =>
   res.status(200).json({ success: true, role: req.session.role })
