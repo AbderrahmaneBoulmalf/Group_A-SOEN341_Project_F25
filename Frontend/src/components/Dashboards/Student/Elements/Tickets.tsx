@@ -128,6 +128,7 @@ const Tickets: React.FC = () => {
               navigate(location.pathname, { replace: true });
             } catch (err: any) {
               // Show specific feedback if possible
+              const serverMsg = err?.response?.data?.message;
               if (err?.response?.status === 409) {
                 showMessage({
                   type: "warning",
@@ -143,6 +144,8 @@ const Tickets: React.FC = () => {
                   type: "warning",
                   content: "You need to be logged in to claim a ticket.",
                 });
+              } else if (serverMsg) {
+                showMessage({ type: "warning", content: String(serverMsg) });
               } else {
                 showMessage({
                   type: "error",

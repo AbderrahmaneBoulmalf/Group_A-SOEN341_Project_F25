@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 
 import db from "./db.js";
 import authMiddleware from "./middleware/authMiddleware.js";
-import auth from "./accounts/auth.js";
+import authModuleController from "./accounts/auth.js";
 import events from "./events/events.js";
 import analytics from "./analytics/analytics.js";
 import userService from "./accounts/userService.js";
@@ -54,9 +54,12 @@ app.use((req, _res, next) => {
 
 console.log("Database module imported:", db ? "success" : "failed");
 
-app.post("/register", auth.register);
-app.post("/login", auth.login);
-app.post("/logout", auth.logout);
+app.post("/register", authModuleController.register);
+app.post("/login", authModuleController.login);
+app.post("/logout", authModuleController.logout);
+app.post("/auth/forgot-password", authModuleController.forgotPassword);
+app.post("/auth/verify-reset-token", authModuleController.verifyToken);
+app.post("/account/resetPassword", authModuleController.resetPassword);
 
 app.get("/verify-session", authMiddleware.requireAuth, (req, res) =>
   res.status(200).json({ success: true, role: req.session.role })
@@ -191,6 +194,28 @@ app.post(
 
         const [existing] = await conn.query(
           "SELECT * FROM ClaimedTickets WHERE student_id = ? AND event_id = ? FOR UPDATE",
+      // Check event exists and has not already occurred
+      const [eventRows] = await db
+        .promise()
+        .query("SELECT id, date FROM events WHERE id = ?", [eventId]);
+      const eventRow = (eventRows as any[])[0];
+      if (!eventRow) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Event not found" });
+      }
+      const eventDate = new Date(eventRow.date);
+      if (!isNaN(eventDate.getTime()) && eventDate.getTime() < Date.now()) {
+        return res.status(400).json({
+          success: false,
+          message: "Cannot claim ticket for past event",
+        });
+      }
+
+      const [existing] = await db
+        .promise()
+        .query(
+          "SELECT * FROM ClaimedTickets WHERE student_id = ? AND event_id = ?",
           [studentId, eventId]
         );
         if ((existing as any[]).length > 0) {
@@ -292,6 +317,28 @@ app.post(
 
         const [existing] = await conn.query(
           "SELECT * FROM ClaimedTickets WHERE student_id = ? AND event_id = ? FOR UPDATE",
+      // Check event exists and has not already occurred
+      const [eventRows] = await db
+        .promise()
+        .query("SELECT id, date FROM events WHERE id = ?", [eventId]);
+      const eventRow = (eventRows as any[])[0];
+      if (!eventRow) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Event not found" });
+      }
+      const eventDate = new Date(eventRow.date);
+      if (!isNaN(eventDate.getTime()) && eventDate.getTime() < Date.now()) {
+        return res.status(400).json({
+          success: false,
+          message: "Cannot pay/claim ticket for past event",
+        });
+      }
+
+      const [existing] = await db
+        .promise()
+        .query(
+          "SELECT * FROM ClaimedTickets WHERE student_id = ? AND event_id = ?",
           [studentId, eventId]
         );
         if ((existing as any[]).length > 0) {

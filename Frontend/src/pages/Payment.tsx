@@ -76,6 +76,7 @@ const Payment: React.FC = () => {
                 });
               }
             } catch (err: any) {
+              const serverMsg = err?.response?.data?.message;
               if (err?.response?.status === 409) {
                 navigate("/student/tickets", {
                   state: {
@@ -91,6 +92,16 @@ const Payment: React.FC = () => {
                   content: "Sorry, the event is fully booked.",
                 });
                 return;
+              } else if (err?.response?.status === 401) {
+                // if session expired, redirect to login preserving claimEventId
+                navigate(
+                  `/login?redirectTo=/payment&claimEventId=${encodeURIComponent(
+                    String(eventId)
+                  )}`
+                );
+                return;
+              } else if (serverMsg) {
+                showMessage({ type: "warning", content: String(serverMsg) });
               } else {
                 showMessage({
                   type: "error",
@@ -139,6 +150,7 @@ const Payment: React.FC = () => {
               });
             }
           } catch (err: any) {
+            const serverMsg = err?.response?.data?.message;
             if (err?.response?.status === 409) {
               navigate("/student/tickets", {
                 state: {
@@ -156,6 +168,8 @@ const Payment: React.FC = () => {
                 )}`
               );
               return;
+            } else if (serverMsg) {
+              showMessage({ type: "warning", content: String(serverMsg) });
             } else {
               showMessage({
                 type: "error",
