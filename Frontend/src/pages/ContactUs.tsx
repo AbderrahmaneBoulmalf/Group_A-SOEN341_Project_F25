@@ -1,19 +1,37 @@
 import React, { useState } from "react";
+import axios from "axios";
 import Navbar from "@/components/navbar";
 
 const ContactUs: React.FC = () => {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.name && form.email && form.message) {
-      setSubmitted(true);
+    if (!form.name || !form.email || !form.message) return;
+
+    try {
+      setSubmitting(true);
+      setStatus(null);
+
+      await axios.post("http://localhost:8787/contact/send", {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        message: form.message.trim(),
+      });
+
+      setStatus({ type: "success", message: "Your message has been sent successfully!" });
       setForm({ name: "", email: "", message: "" });
+    } catch (error) {
+      console.error("Failed to send contact message", error);
+      setStatus({ type: "error", message: "Failed to send your message. Please try again later." });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -33,9 +51,13 @@ const ContactUs: React.FC = () => {
               Send us a message
             </h2>
 
-            {submitted && (
-              <p className="text-green-600 font-medium mb-4">
-                Your message has been sent successfully!
+            {status && (
+              <p
+                className={`${
+                  status.type === "success" ? "text-green-600" : "text-red-600"
+                } font-medium mb-4`}
+              >
+                {status.message}
               </p>
             )}
 
@@ -79,9 +101,10 @@ const ContactUs: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-all"
+                className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-all disabled:opacity-70 disabled:cursor-not-allowed"
+                disabled={submitting}
               >
-                Send Message
+                {submitting ? "Sending..." : "Send Message"}
               </button>
             </form>
           </div>
