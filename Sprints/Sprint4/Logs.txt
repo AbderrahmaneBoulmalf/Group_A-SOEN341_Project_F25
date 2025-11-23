@@ -5,3 +5,10 @@ Contributions:
 - Tested functionalities and wrote unit test (30min)
 - Improved block diagram and improved styling (1.5h)
 - Added testing instructions in README.md (15min)
+
+Rafael Lenz
+
+Contributions:
+-Bugfixed QR Code Generation Issues (2.5h)
+-Changed Error Messages (5min)
+-Worked on Presentation Slides (45min)
