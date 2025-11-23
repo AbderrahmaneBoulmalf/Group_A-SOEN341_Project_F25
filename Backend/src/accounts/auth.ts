@@ -192,27 +192,20 @@ const forgotPassword = async (req: Request, res: Response): Promise<void> => {
       expiresIn: "1h",
     });
 
-    //Fake email for demo purposes
-    const testAccount = await nodemailer.createTestAccount();
-
     const transporter = nodemailer.createTransport({
-      host: "smtp.ethereal.email",
-      port: 587,
-      secure: false,
+      service: "gmail",
       auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
+        user: process.env.EMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
       },
     });
 
-    const info = await transporter.sendMail({
-      from: '"EventHub" <no-reply@eventhub.com>',
+    await transporter.sendMail({
+      from: `"EventHub" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Password Reset",
       text: `Click here to reset your password: http://localhost:5173/reset-password/${token}`,
     });
-
-    console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
 
     res.json({ success: true });
   } catch (error) {
