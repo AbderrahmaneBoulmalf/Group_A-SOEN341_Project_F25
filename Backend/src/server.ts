@@ -187,13 +187,6 @@ app.post(
           .json({ success: false, message: "Missing or invalid eventId" });
       }
 
-      // Use a transaction and row lock to ensure capacity is checked/decremented atomically
-      const conn = await db.promise().getConnection();
-      try {
-        await conn.beginTransaction();
-
-        const [existing] = await conn.query(
-          "SELECT * FROM ClaimedTickets WHERE student_id = ? AND event_id = ? FOR UPDATE",
       // Check event exists and has not already occurred
       const [eventRows] = await db
         .promise()
@@ -218,66 +211,24 @@ app.post(
           "SELECT * FROM ClaimedTickets WHERE student_id = ? AND event_id = ?",
           [studentId, eventId]
         );
-        if ((existing as any[]).length > 0) {
-          await conn.rollback();
-          conn.release();
-          return res
-            .status(409)
-            .json({ success: false, message: "Ticket already claimed" });
-        }
+      if ((existing as any[]).length > 0) {
+        return res
+          .status(409)
+          .json({ success: false, message: "Ticket already claimed" });
+      }
 
-        const [eventRows] = await conn.query(
-          "SELECT id, capacity FROM events WHERE id = ? FOR UPDATE",
-          [eventId]
-        );
-        const ev = (eventRows as any[])[0];
-        if (!ev) {
-          await conn.rollback();
-          conn.release();
-          return res
-            .status(404)
-            .json({ success: false, message: "Event not found" });
-        }
-
-        // If capacity is null => treat as unlimited. Otherwise enforce capacity > 0
-        const capacityVal = ev.capacity;
-        if (capacityVal !== null && Number(capacityVal) <= 0) {
-          await conn.rollback();
-          conn.release();
-          return res.status(400).json({
-            success: false,
-            message: "Sorry, the event is fully booked.",
-          });
-        }
-
-        const [insertResult] = await conn.query(
+      const [insertResult] = await db
+        .promise()
+        .query(
           "INSERT INTO ClaimedTickets (student_id, event_id) VALUES (?, ?)",
           [studentId, eventId]
         );
 
-        // Decrement capacity when applicable
-        if (capacityVal !== null) {
-          await conn.query(
-            "UPDATE events SET capacity = capacity - 1 WHERE id = ?",
-            [eventId]
-          );
-        }
-
-        await conn.commit();
-        conn.release();
-
-        return res.status(200).json({
-          success: true,
-          message: "Ticket claimed",
-          ticketId: (insertResult as any).insertId ?? null,
-        });
-      } catch (err) {
-        try {
-          await conn.rollback();
-        } catch (_) {}
-        conn.release();
-        throw err;
-      }
+      return res.status(200).json({
+        success: true,
+        message: "Ticket claimed",
+        ticketId: (insertResult as any).insertId ?? null,
+      });
     } catch (err) {
       res.status(500).json({
         success: false,
@@ -310,13 +261,6 @@ app.post(
           .status(400)
           .json({ success: false, message: "Invalid payment info" });
 
-      // Transactional flow to prevent race conditions on capacity
-      const conn = await db.promise().getConnection();
-      try {
-        await conn.beginTransaction();
-
-        const [existing] = await conn.query(
-          "SELECT * FROM ClaimedTickets WHERE student_id = ? AND event_id = ? FOR UPDATE",
       // Check event exists and has not already occurred
       const [eventRows] = await db
         .promise()
@@ -341,65 +285,23 @@ app.post(
           "SELECT * FROM ClaimedTickets WHERE student_id = ? AND event_id = ?",
           [studentId, eventId]
         );
-        if ((existing as any[]).length > 0) {
-          await conn.rollback();
-          conn.release();
-          return res
-            .status(409)
-            .json({ success: false, message: "Ticket already claimed" });
-        }
+      if ((existing as any[]).length > 0)
+        return res
+          .status(409)
+          .json({ success: false, message: "Ticket already claimed" });
 
-        const [eventRows] = await conn.query(
-          "SELECT id, capacity FROM events WHERE id = ? FOR UPDATE",
-          [eventId]
-        );
-        const ev = (eventRows as any[])[0];
-        if (!ev) {
-          await conn.rollback();
-          conn.release();
-          return res
-            .status(404)
-            .json({ success: false, message: "Event not found" });
-        }
-
-        const capacityVal = ev.capacity;
-        if (capacityVal !== null && Number(capacityVal) <= 0) {
-          await conn.rollback();
-          conn.release();
-          return res.status(400).json({
-            success: false,
-            message: "Sorry, the event is fully booked.",
-          });
-        }
-
-        // Here would normally be payment processing. Assuming payment succeeds:
-        const [insertResult] = await conn.query(
+      const [insertResult] = await db
+        .promise()
+        .query(
           "INSERT INTO ClaimedTickets (student_id, event_id) VALUES (?, ?)",
           [studentId, eventId]
         );
 
-        if (capacityVal !== null) {
-          await conn.query(
-            "UPDATE events SET capacity = capacity - 1 WHERE id = ?",
-            [eventId]
-          );
-        }
-
-        await conn.commit();
-        conn.release();
-
-        return res.status(200).json({
-          success: true,
-          message: "Payment accepted, ticket claimed",
-          ticketId: (insertResult as any).insertId ?? null,
-        });
-      } catch (err) {
-        try {
-          await conn.rollback();
-        } catch (_) {}
-        conn.release();
-        throw err;
-      }
+      return res.status(200).json({
+        success: true,
+        message: "Payment accepted, ticket claimed",
+        ticketId: (insertResult as any).insertId ?? null,
+      });
     } catch (err) {
       return res.status(500).json({
         success: false,
