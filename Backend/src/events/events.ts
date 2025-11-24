@@ -688,7 +688,7 @@ const getEventAnalytics = async (req: Request, res: Response) => {
   }
 
   try {
-    // Tickets sold
+    // Tickets sold (from ClaimedTickets)
     const [ticketsResult] = await db.promise().query(
       `SELECT COUNT(*) AS ticketsSold
          FROM ClaimedTickets
@@ -697,6 +697,15 @@ const getEventAnalytics = async (req: Request, res: Response) => {
     );
     const ticketsSold = (ticketsResult as any)[0]?.ticketsSold || 0;
 
+    // Attendance (from TicketPasses)
+    const [attendanceResult] = await db.promise().query(
+      `SELECT COUNT(*) AS attendance
+         FROM TicketPasses
+         WHERE event_id = ?`,
+      [eventId]
+    );
+    const attendance = (attendanceResult as any)[0]?.attendance || 0;
+
     // Event info
     const [eventResult] = await db
       .promise()
@@ -704,9 +713,6 @@ const getEventAnalytics = async (req: Request, res: Response) => {
     const eventRow = (eventResult as any)[0];
     const price = eventRow?.price || 0;
     const capacity = eventRow?.capacity || 0;
-
-    // Attendance (if no checked_in column, assume all tickets are attended)
-    const attendance = ticketsSold;
 
     // Revenue
     const revenue = ticketsSold * price;
