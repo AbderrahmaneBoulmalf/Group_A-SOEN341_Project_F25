@@ -25,7 +25,7 @@ const Menu: React.FC = () => {
     },
     "/manager": {
       title: "My Events",
-      text: "Here's a quick overview of all your scheduled events. Press on any event to view analytics.",
+      text: "Here's a quick overview of all your scheduled events.",
     },
     "/manager/event/:id": {
       title: "My Events",
