@@ -35,3 +35,11 @@ Contributions:
 -Completed the final report table and project summary (1h)
 -Completed the Velocity and list of user stories and tasks for all iterations (1h30min)
 -Updated and corrected story points on GitHub issues (30min)
+
+Ziad Agha
+
+Contributions:
+- Updated the database by adding a manager_id column to the events table and updated functions that use the events table.(40 mins)
+- Fixed the event filtering in the manager's dashboard to only filter by the manager's id.(30 mins)
+- Fixed the event listing to show all events for managers as well.(10 mins)
+- Added missing sub-issue on github with labels.(10 mins)
