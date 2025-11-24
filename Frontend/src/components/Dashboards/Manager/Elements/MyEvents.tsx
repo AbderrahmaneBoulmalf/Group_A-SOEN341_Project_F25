@@ -35,11 +35,10 @@ const MyEvents: React.FC = () => {
       setError(false);
       try {
         const [profileResponse, eventsResponse] = await Promise.all([
-          axios.get("http://localhost:8787/profile", {
-            withCredentials: true,
-          }),
+          axios.get("http://localhost:8787/profile", { withCredentials: true }),
           axios.get("http://localhost:8787/api/events", {
             withCredentials: true,
+            params: { managerOnly: true }, // <-- only filter for manager dashboard
           }),
         ]);
 
@@ -66,23 +65,8 @@ const MyEvents: React.FC = () => {
     fetchEvents();
   }, [messageApi]);
 
-  const { filteredEvents, filterApplied } = useMemo(() => {
-    if (!profile?.email) {
-      return { filteredEvents: events, filterApplied: false };
-    }
-
-    const normalizedEmail = profile.email.trim().toLowerCase();
-    const ownEvents = events.filter((event) => {
-      const eventEmail = event.contactEmail?.trim().toLowerCase();
-      return eventEmail && eventEmail === normalizedEmail;
-    });
-
-    if (ownEvents.length > 0) {
-      return { filteredEvents: ownEvents, filterApplied: true };
-    }
-
-    return { filteredEvents: events, filterApplied: false };
-  }, [events, profile]);
+  const filteredEvents = events;
+  const filterApplied = false;
 
   const formatDate = (iso?: string) => {
     if (!iso) return "Date to be determined";
@@ -123,7 +107,9 @@ const MyEvents: React.FC = () => {
       const url = window.URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      const safeTitle = event.title ? slugify(event.title) : `event-${event.id}`;
+      const safeTitle = event.title
+        ? slugify(event.title)
+        : `event-${event.id}`;
       anchor.download = `${safeTitle || `event-${event.id}`}-attendees.csv`;
       document.body.appendChild(anchor);
       anchor.click();
@@ -185,70 +171,78 @@ const MyEvents: React.FC = () => {
     <div className="ml-4 mr-4 mt-2 mb-10 flex h-[98%] justify-center overflow-y-auto">
       {contextHolder}
       <div className="mt-4 w-full max-w-6xl">
-        {filterApplied && profile?.email && (
-          <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-700">
-            Showing events with contact email <strong>{profile.email}</strong>.
-          </div>
-        )}
         <div className="grid gap-6 md:grid-cols-2">
-        {filteredEvents.map((event) => {
-  const tagList = formatTags(event.tags);
-  return (
-    <Link
-      key={event.id}
-      to={`/manager/event/${event.id}`}
-      className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
-    >
-      <div className="flex-1">
-        <h3 className="text-xl font-semibold text-slate-900">
-          {event.title}
-        </h3>
-        <p className="mt-1 text-sm text-slate-500">
-          {formatDate(event.date)}
-        </p>
-        {event.location && (
-          <p className="mt-1 text-sm text-slate-600">
-            Location: {event.location}
-          </p>
-        )}
-        {event.description && (
-          <p className="mt-3 text-sm text-slate-700">
-            {event.description}
-          </p>
-        )}
-        {tagList && tagList.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {tagList.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700"
+          {filteredEvents.map((event) => {
+            const tagList = formatTags(event.tags);
+            return (
+              <div
+                key={event.id}
+                className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
               >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-      <div className="mt-6 flex items-center justify-between">
-        <div className="text-xs text-slate-500">
-          Event ID: <span className="font-medium">{event.id}</span>
-        </div>
-        <Button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault(); // Prevent Link click
-            handleDownload(event);
-          }}
-          disabled={downloadingId === event.id}
-          className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
-        >
-          <DownloadOutlined />
-          {downloadingId === event.id ? "Preparing..." : "Export CSV"}
-        </Button>
-      </div>
-    </Link>
-  );
-})}
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-slate-900">
+                    {event.title}
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {formatDate(event.date)}
+                  </p>
+                  {event.location && (
+                    <p className="mt-1 text-sm text-slate-600">
+                      Location: {event.location}
+                    </p>
+                  )}
+                  {event.description && (
+                    <p className="mt-3 text-sm text-slate-700">
+                      {event.description}
+                    </p>
+                  )}
+                  {tagList && tagList.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {tagList.map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="mt-6 flex items-center justify-between gap-2">
+                  <div className="text-xs text-slate-500">
+                    Event ID: <span className="font-medium">{event.id}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleDownload(event);
+                      }}
+                      disabled={downloadingId === event.id}
+                      className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
+                    >
+                      <DownloadOutlined />
+                      {downloadingId === event.id
+                        ? "Preparing..."
+                        : "Export CSV"}
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.location.href = `/manager/event/${event.id}`;
+                      }}
+                      className="flex items-center gap-2 bg-gray-600 text-white hover:bg-gray-700"
+                    >
+                      Analytics
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

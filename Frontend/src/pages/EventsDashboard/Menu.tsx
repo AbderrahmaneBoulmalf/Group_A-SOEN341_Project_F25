@@ -29,7 +29,7 @@ const Menu: React.FC = () => {
     },
     "/manager/event/:id": {
       title: "My Events",
-      text: "View detailed analytics for this event",
+      text: "View detailed analytics for this event.",
     },
   };
 
@@ -38,7 +38,7 @@ const Menu: React.FC = () => {
   const title: textMapType = isAnalyticsPage
     ? {
         title: "My Events",
-        text: "View detailed analytics for this event",
+        text: "View detailed analytics for this event.",
       }
     : textMap[path] || { title: "Page Not Found", text: "" };
 

@@ -417,7 +417,7 @@ interface EventResponse {
 
 const getEvents = async (req: Request, res: Response) => {
   try {
-    const { search, category, dateFrom, dateTo, sort } =
+    const { search, category, dateFrom, dateTo, sort, managerOnly } =
       (req.query as Record<string, string>) || {};
 
     let sql = `
@@ -441,15 +441,16 @@ const getEvents = async (req: Request, res: Response) => {
         endTime,
         registrationDeadline,
         isOnline,
-        meetingLink
+        meetingLink,
+        manager_id
       FROM events
       WHERE 1=1
     `;
     const params: any[] = [];
 
-    // --- Filter by manager's contactEmail ---
-    if (req.session.role === "manager") {
-      sql += ` AND contactEmail = (SELECT Email FROM Users WHERE ID = ?)`;
+    // --- Filter by manager's events using manager_id ---
+    if (managerOnly === "true" && req.session.role === "manager") {
+      sql += ` AND manager_id = ?`;
       params.push(req.session.userId);
     }
 
@@ -476,9 +477,8 @@ const getEvents = async (req: Request, res: Response) => {
       params.push(dateTo.trim());
     }
 
-    // === SORTING (capacity vs date) — exactly one ORDER BY ===
+    // Sorting
     if (sort === "capacity") {
-      // NULL/'' last, numeric desc, then date asc
       sql += `
         ORDER BY
           CASE
@@ -494,41 +494,21 @@ const getEvents = async (req: Request, res: Response) => {
 
     const [results] = await db.promise().query(sql, params);
 
-    // process tags
     const processedResults: EventResponse[] = (results as EventRow[]).map(
       (event) => {
         let tags: string[] = [];
         if (event.tags) {
           try {
             const parsed = JSON.parse(event.tags);
-            if (Array.isArray(parsed)) {
-              tags = parsed.map((tag) => String(tag).trim()).filter(Boolean);
-            }
+            if (Array.isArray(parsed)) tags = parsed.map((t) => t.trim());
           } catch {}
         }
 
         return {
-          id: event.id,
-          title: event.title,
-          date: event.date,
-          organization: event.organization,
-          description: event.description,
-          location: event.location,
-          category: event.category,
-          capacity: event.capacity ?? undefined,
-          price: event.price ?? undefined,
-          imageUrl: event.imageUrl ?? undefined,
-          longDescription: event.longDescription ?? undefined,
-          requirements: event.requirements ?? undefined,
-          contactEmail: event.contactEmail ?? undefined,
-          contactPhone: event.contactPhone ?? undefined,
+          ...event,
           tags,
-          startTime: event.startTime ?? undefined,
-          endTime: event.endTime ?? undefined,
-          registrationDeadline: event.registrationDeadline ?? undefined,
           isOnline: Boolean(event.isOnline),
-          meetingLink: event.meetingLink ?? undefined,
-        };
+        } as EventResponse;
       }
     );
 
@@ -655,10 +635,13 @@ const createEvent = async (
         endTime,
         registrationDeadline,
         isOnline,
-        meetingLink
+        meetingLink,
+        manager_id
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
+
+    const managerId = req.session.userId; // assign from logged-in session
 
     const params = [
       body.title.trim(),
@@ -680,6 +663,7 @@ const createEvent = async (
       body.registrationDeadline || null,
       body.isOnline ? 1 : 0,
       body.isOnline ? body.meetingLink?.trim() || null : null,
+      managerId,
     ];
 
     const [result] = await db.promise().query<ResultSetHeader>(sql, params);
@@ -695,6 +679,7 @@ const createEvent = async (
       .json({ success: false, message: "Failed to create event" });
   }
 };
+
 const getEventAnalytics = async (req: Request, res: Response) => {
   const eventId = parseInt(req.params.id, 10);
 
@@ -703,7 +688,7 @@ const getEventAnalytics = async (req: Request, res: Response) => {
   }
 
   try {
-    // Tickets sold
+    // Tickets sold (from ClaimedTickets)
     const [ticketsResult] = await db.promise().query(
       `SELECT COUNT(*) AS ticketsSold
          FROM ClaimedTickets
@@ -712,6 +697,15 @@ const getEventAnalytics = async (req: Request, res: Response) => {
     );
     const ticketsSold = (ticketsResult as any)[0]?.ticketsSold || 0;
 
+    // Attendance (from TicketPasses)
+    const [attendanceResult] = await db.promise().query(
+      `SELECT COUNT(*) AS attendance
+         FROM TicketPasses
+         WHERE event_id = ?`,
+      [eventId]
+    );
+    const attendance = (attendanceResult as any)[0]?.attendance || 0;
+
     // Event info
     const [eventResult] = await db
       .promise()
@@ -719,9 +713,6 @@ const getEventAnalytics = async (req: Request, res: Response) => {
     const eventRow = (eventResult as any)[0];
     const price = eventRow?.price || 0;
     const capacity = eventRow?.capacity || 0;
-
-    // Attendance (if no checked_in column, assume all tickets are attended)
-    const attendance = ticketsSold;
 
     // Revenue
     const revenue = ticketsSold * price;
