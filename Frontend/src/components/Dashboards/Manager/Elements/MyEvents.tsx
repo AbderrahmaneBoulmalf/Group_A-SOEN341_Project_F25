@@ -35,11 +35,10 @@ const MyEvents: React.FC = () => {
       setError(false);
       try {
         const [profileResponse, eventsResponse] = await Promise.all([
-          axios.get("http://localhost:8787/profile", {
-            withCredentials: true,
-          }),
+          axios.get("http://localhost:8787/profile", { withCredentials: true }),
           axios.get("http://localhost:8787/api/events", {
             withCredentials: true,
+            params: { managerOnly: true }, // <-- only filter for manager dashboard
           }),
         ]);
 

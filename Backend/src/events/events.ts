@@ -417,7 +417,7 @@ interface EventResponse {
 
 const getEvents = async (req: Request, res: Response) => {
   try {
-    const { search, category, dateFrom, dateTo, sort } =
+    const { search, category, dateFrom, dateTo, sort, managerOnly } =
       (req.query as Record<string, string>) || {};
 
     let sql = `
@@ -449,7 +449,7 @@ const getEvents = async (req: Request, res: Response) => {
     const params: any[] = [];
 
     // --- Filter by manager's events using manager_id ---
-    if (req.session.role === "manager") {
+    if (managerOnly === "true" && req.session.role === "manager") {
       sql += ` AND manager_id = ?`;
       params.push(req.session.userId);
     }
