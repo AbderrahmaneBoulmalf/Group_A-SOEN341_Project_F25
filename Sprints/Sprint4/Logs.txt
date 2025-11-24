@@ -28,3 +28,10 @@ Contributions:
 -Bug Fixing for US.05 (1h)
 -Added acceptance Testing for US.05(5min)
 -Completed Class diagram for backend (2h)
+
+Maria Laghmari
+
+Contributions:
+Completed the final report table and project summary (1h)
+Completed the Velocity and list of user stories and tasks for all iterations (1h30min)
+Updated and corrected story points on GitHub issues (30min)
