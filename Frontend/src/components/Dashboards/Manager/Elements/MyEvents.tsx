@@ -175,9 +175,8 @@ const MyEvents: React.FC = () => {
           {filteredEvents.map((event) => {
             const tagList = formatTags(event.tags);
             return (
-              <Link
+              <div
                 key={event.id}
-                to={`/manager/event/${event.id}`}
                 className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex-1">
@@ -210,24 +209,38 @@ const MyEvents: React.FC = () => {
                     </div>
                   )}
                 </div>
-                <div className="mt-6 flex items-center justify-between">
+                <div className="mt-6 flex items-center justify-between gap-2">
                   <div className="text-xs text-slate-500">
                     Event ID: <span className="font-medium">{event.id}</span>
                   </div>
-                  <Button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault(); // Prevent Link click
-                      handleDownload(event);
-                    }}
-                    disabled={downloadingId === event.id}
-                    className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
-                  >
-                    <DownloadOutlined />
-                    {downloadingId === event.id ? "Preparing..." : "Export CSV"}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleDownload(event);
+                      }}
+                      disabled={downloadingId === event.id}
+                      className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
+                    >
+                      <DownloadOutlined />
+                      {downloadingId === event.id
+                        ? "Preparing..."
+                        : "Export CSV"}
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        window.location.href = `/manager/event/${event.id}`;
+                      }}
+                      className="flex items-center gap-2 bg-gray-600 text-white hover:bg-gray-700"
+                    >
+                      Analytics
+                    </Button>
+                  </div>
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>
