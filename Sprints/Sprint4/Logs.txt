@@ -43,3 +43,11 @@ Contributions:
 - Fixed the event filtering in the manager's dashboard to only filter by the manager's id.(30 mins)
 - Fixed the event listing to show all events for managers as well.(10 mins)
 - Added missing sub-issue on github with labels.(10 mins)
+
+Sofian Boutamo
+
+Contributions:
+- Implemented backend validation preventing users from claiming tickets for past events (1.5h)
+- Added event capacity checks before ticket creation and returned appropriate error messages when full (1h)
+- Implemented automatic decrement of available tickets with proper error handling and atomic database updates (2h)
+- Resolved multiple merge conflicts between feature branches and PRs (45min)
