@@ -21,3 +21,10 @@ Contributions:
 - Fixed signup form validation so error messages only appear after user input (30min)
 - Fixed the check during signup so existing emails show a proper error (15min)
 - Wrote the Infrastructure section of the project report (1h)
+
+Abderrahmane Boulmalf
+
+Contributions:
+-Bug Fixing for US.05 (1h)
+-Added acceptance Testing for US.05(5min)
+-Completed Class diagram for backend (2h)
