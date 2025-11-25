@@ -43,6 +43,7 @@ Contributions:
 - Fixed the event filtering in the manager's dashboard to only filter by the manager's id.(30 mins)
 - Fixed the event listing to show all events for managers as well.(10 mins)
 - Added missing sub-issue on github with labels.(10 mins)
+- completed static analysis tool description, report and problem-discussion table.(40 mins)
 
 Sofian Boutamo
 
