@@ -51,3 +51,9 @@ Contributions:
 - Added event capacity checks before ticket creation and returned appropriate error messages when full (1h)
 - Implemented automatic decrement of available tickets with proper error handling and atomic database updates (2h)
 - Resolved multiple merge conflicts between feature branches and PRs (45min)
+
+Mohamed Amine Dakli
+
+Contributions:
+- Verified codebase for any bugs in parts I worked on (1h)
+- Added a demonstration video of the student User story (30min)
